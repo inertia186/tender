@@ -1,0 +1,6 @@
+.badge-pill.badge-light.p-1.inset-shadow
+  .bd-highlight.d-flex.align-content-around.flex-wrap
+    - event['data'].each do |k, v|
+      .bd-highlight= "#{k}: #{v}&nbsp;".html_safe
+    - if !!memo
+      %code.p-2.bd-highlight= memo

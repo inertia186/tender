@@ -1,0 +1,70 @@
+@import 'bootstrap';
+
+body, .card-header, .card-footer {
+  background-color: AliceBlue;
+}
+
+.card-body {
+  background-color: WhiteSmoke;
+}
+
+.inset-shadow {
+  box-shadow: inset 0 .025rem .05rem rgba(0,0,0,.15)!important;
+}
+
+.op {
+  color: #888;
+  padding: 4px;
+  margin-bottom: 5px;
+  background: #FFF;
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  font-weight: 300;
+  font-size: 17px;
+  z-index: 10;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  line-height: 1.429;
+}
+
+.op .tag {
+  font-size: 11px;
+  float: right;
+  margin: -1px 0 0 8px;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  color: #BBB;
+}
+
+.op .foot {
+  font-size: 70%;
+  vertical-align: middle;
+  color: #AAA;
+  line-height: 1.2;
+  display: inline-block;
+}
+
+.op-mini {
+  line-height: 1.1;
+  background: #FDFDFD;
+}
+
+.op-mini .action {
+  font-size: 82.4%;
+  display: inline;
+}
+
+.op-mini .foot:before {
+  content: "\00b7";
+  margin: 0 5px 0 2px;
+}
+
+.symbol {
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+version {
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}

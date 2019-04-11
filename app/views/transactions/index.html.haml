@@ -1,0 +1,8 @@
+- if !!transactions_params[:account]
+  %h1
+    %span.text-muted>< @
+    %span>< #{transactions_params[:account]}
+
+= render partial: 'transaction', collection: @transactions
+
+= will_paginate(@transactions, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)

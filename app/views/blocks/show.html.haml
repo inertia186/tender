@@ -1,0 +1,14 @@
+#block
+
+:javascript
+  $(document).on('turbolinks:load', function() {
+    $.getJSON( document.location.href, function( data ) {
+      formatter = new JSONFormatter(data.block);
+      formatter.openAtDepth(3);
+      $('#block').html(formatter.render());
+    });
+  });
+
+%hr
+
+%code= link_to :as_json, b_path(blocks_params[:block_num], format: :json)

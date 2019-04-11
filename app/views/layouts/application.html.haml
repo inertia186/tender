@@ -1,0 +1,44 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title Tender
+    = csrf_meta_tags
+    = csp_meta_tag
+    = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
+    = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
+    = favicon_link_tag 'favicon.png', type: 'image/png'
+    = favicon_link_tag 'favicon.png', rel: 'apple-touch-icon', type: 'image/png'
+  %body
+    .card
+      .card-header
+        .dropdown.float-right.px-5
+          - quick_links = []
+          - if !!(transfers_to = params[:account] || params[:to])
+            - quick_links << link_to("Transfers To: #{transfers_to}", transfers_path(to: transfers_to), class: 'dropdown-item')
+            - quick_links << link_to("Issued To: #{transfers_to}", issues_path(to: transfers_to), class: 'dropdown-item')
+          - if quick_links.any?
+            %button.btn.btn-secondary.dropdown-toggle#dropdownMenuButton{type: 'button', data: {toggle: 'dropdown'}, aria: {haspopup: true, expanded: false}}
+              Quick Links
+            .dropdown-menu{aria: {labelledby: 'dropdownMenuButton'}}
+              = quick_links.join.html_safe
+        %h3.text-muted= link_to 'Steem Engine Block Explorer', root_url
+      .card-body
+        .container-fluid
+          %ul.nav.nav-tabs
+            -# %li.nav-item= link_to 'Dashboard', dashboard_index_path, class: 'nav-link' + (controller_name == 'dashboard' ? ' active' : '')
+          - if replaying?
+            .text-center.alert.alert-danger Replay in progress.  Sidechain sync is pending, please check back later.
+          = yield
+    .card-footer.text-center
+      %small
+        .figure.figure
+          .figcaption.figure-caption
+            Learn more:
+            = link_to 'Steem Engine', 'https://steem-engine.com/?p=faq&utm_source=tender'
+            \|
+            Source: 
+            = link_to 'Tender', ''
+            \|
+            Version:
+            %version #{Tender::Application::VERSION}

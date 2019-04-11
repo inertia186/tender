@@ -1,0 +1,27 @@
+.row
+  .col-sm-12
+    %table.table.table-striped
+      %thead
+        %tr
+          %th Name
+          %th Symbol
+          %th Issuer
+          %th Precision
+          %th Max Supply
+          %th Created
+      %tbody
+      - @tokens.each do |token|
+        %tr
+          %td= token.name.truncate(20)
+          - url = JSON[TokensUpdateMetadata.find_by(symbol: token.symbol).try(:metadata) || '{}'].fetch('url', token.url)
+          - if !!url
+            - url = "https://#{url.sub(/^http(s?):\/\//i, '').strip}"
+            %td.symbol= link_to token.symbol, URI.parse(url).to_s
+          - else
+            %td.symbol= token.symbol
+          %td= link_to token.trx.sender, account_home_path(token.trx.sender)
+          %td= token.precision
+          %td= number_with_delimiter token.max_supply
+          %td= token.trx.timestamp
+
+  = will_paginate(@transactions, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)

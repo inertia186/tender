@@ -1,0 +1,28 @@
+.row
+  .col-sm-12.p-1
+    .op.op-mini.shadow-sm.bg-white.rounded{id: transaction.trx_id}
+      %span.action
+        - payload = JSON[transaction.payload]
+        = link_to transaction.sender, account_home_path(transaction.sender)
+        - if transaction.contract == 'tokens' && ( transaction.action == 'transfer' || transaction.action == 'issue' )
+          = case transaction.action
+          - when 'transfer' then 'transferred'
+          - when 'issue' then 'issued'
+          - else; transaction.action
+          &nbsp;
+          %code= number_with_delimiter(payload['quantity']) + ' ' + payload['symbol']
+          to
+          = link_to payload['to'], account_home_path(payload['to'])
+          %code= payload['memo']
+        - else
+          .badge.badge-primary= transaction.contract.underscore.humanize.downcase
+          .badge.badge-primary= transaction.action.underscore.humanize.downcase
+          - if !!(logs = JSON[transaction.logs] rescue {})
+            - if !!logs['events']
+              .d-flex.align-content-around.flex-wrap
+                = render partial: 'event', collection: logs['events'], locals: {memo: payload['memo']}
+            - if !!logs['errors']
+              = render partial: 'error', collection: logs['errors']
+        = link_to transaction.trx_id[0..6], tx_path(transaction.trx_id), class: 'tag'
+        .foot
+          = link_to "#{time_ago_in_words transaction.timestamp} ago", b_path(transaction.block_num)

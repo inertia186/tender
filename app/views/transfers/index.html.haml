@@ -1,0 +1,14 @@
+#transfers
+
+:javascript
+  $(document).on('turbolinks:load', function() {
+    $.getJSON( document.location.href, function( data ) {
+      formatter = new JSONFormatter(data.transfers);
+      formatter.openAtDepth(2);
+      $('#transfers').html(formatter.render());
+    });
+  });
+
+%hr
+
+%code= link_to :as_json, inline_transfers_path(to: transfers_params[:to])
