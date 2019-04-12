@@ -1,4 +1,4 @@
-FROM inertia/meeseeker:latest
+FROM inertia/meeseeker:develop
 
 # default steemd node
 ENV STEEMD_NODE_URL "https://api.steemit.com"
@@ -58,10 +58,13 @@ COPY config config
 COPY db db
 COPY lib lib
 COPY public public
+COPY config.ru .
 COPY Gemfile .
 COPY Gemfile.lock .
 COPY package.json .
 COPY Rakefile .
+COPY LICENSE .
+COPY README.md .
 
 RUN \
   /bin/bash -c " \
@@ -75,7 +78,8 @@ RUN \
       bundle update --bundler && \
       bundle install && \
       RAILS_ENV=production bundle exec rake db:migrate && \
-      RAILS_ENV=production bundle exec rake db:seed \
+      RAILS_ENV=production bundle exec rake db:seed && \
+      RAILS_ENV=production bundle exec rake assets:precompile \
   "
 
 RUN \

@@ -4,6 +4,7 @@
 
 export MEESEEKER_REDIS_URL="redis://127.0.0.1:6379/0"
 export RAILS_ENV=production
+export RAILS_SERVE_STATIC_FILES=true
 
 cd $APP_ROOT
 rvm use ruby-2.4.2

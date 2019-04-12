@@ -41,7 +41,6 @@ check process meeseeker pidfile /meeseeker/meeseeker.pid
   stop program = "/bin/bash -c '$APP_ROOT/bin/stop-meeseeker.sh'"
     with timeout 90 seconds
   group meeseeker
-  if status != 0 for 5 cycles then restart steem-engine-contracts
   
 check process tender pidfile $APP_ROOT/tender.pid
   depends on steem-engine-contracts
