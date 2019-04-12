@@ -8,7 +8,7 @@ class TokensController < ApplicationController
     @tokens = @tokens.order(Transaction.arel_table[:timestamp].asc)
     @tokens = @tokens.paginate(per_page: @per_page, page: @page)
     
-    @eng_token = if Transaction.any?
+    @eng_token = if Transaction.any? && @page == 1
       TokensCreate.new(
         symbol: 'ENG',
         name: 'Steem Engine Token',
