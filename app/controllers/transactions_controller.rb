@@ -8,10 +8,10 @@ class TransactionsController < ApplicationController
     
     if !!transactions_params[:account]
       @accounts = [transactions_params[:account]].flatten
-      where_clause = (['trx_id IN(?)'] * 6).join(' OR ')
+      where_clause = (['id IN(?)'] * 6).join(' OR ')
       
       @transactions = @transactions.where(where_clause,
-        Transaction.where(sender: @accounts).select(:trx_id),
+        Transaction.where(sender: @accounts).select(:id),
         TokensIssue.where(to: @accounts).select(:trx_id),
         TokensTransferOwnership.where(to: @accounts).select(:trx_id),
         SscstoreBuy.where(recipient: @accounts).select(:trx_id),
@@ -26,7 +26,7 @@ class TransactionsController < ApplicationController
   def show
     @start = Time.now
     @trx_id = transactions_params[:trx_id] || transactions_params[:id]
-    @transaction = Transaction.find_by!(trx_id: @trx_id)
+    @transactions = Transaction.where(trx_id: @trx_id)
     @elapsed = Time.now - @start
   end
 private

@@ -1,7 +1,7 @@
 class MarketCancel < ApplicationRecord
-  belongs_to :trx, class_name: 'Transaction', foreign_key: 'trx_id', primary_key: 'trx_id'
+  belongs_to :trx, class_name: 'Transaction', foreign_key: 'trx_id'
   
-  validates_presence_of :trx_id
+  validates_presence_of :trx
   validates_presence_of :action_type
   validates_presence_of :action_id
 end

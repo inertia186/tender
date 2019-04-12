@@ -1,6 +1,7 @@
 json.transfers @transfers do |transfer|
   json.block_num transfer.trx.block_num
-  json.trx_id transfer.trx_id
+  json.trx_id transfer.trx.trx_id
+  json.trx_in_block transfer.trx.trx_in_block
   json.timestamp transfer.trx.timestamp
   json.symbol transfer.symbol
   json.from transfer.trx.sender

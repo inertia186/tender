@@ -13,65 +13,71 @@
 ActiveRecord::Schema.define(version: 2019_04_05_155538) do
 
   create_table "market_buys", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "symbol", null: false
     t.string "quantity", null: false
     t.string "price", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "symbol"], name: "market_buys-by-trx_id-symbol"
   end
 
   create_table "market_cancels", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "action_type", null: false
     t.string "action_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", nil], name: "market_cancels-by-trx_id-symbol"
   end
 
   create_table "market_sells", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "symbol", null: false
     t.string "quantity", null: false
     t.string "price", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "symbol"], name: "market_sells-by-trx_id-symbol"
   end
 
   create_table "sscstore_buys", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "recipient", null: false
     t.string "amount_steemsbd", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "recipient"], name: "sscstore_buys-by-trx_id-recipient"
   end
 
   create_table "steempegged_buys", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "recipient", null: false
     t.string "amount_steemsbd", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "recipient"], name: "steempegged_buys-by-trx_id-recipient"
   end
 
   create_table "steempegged_remove_withdrawals", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "action_id", null: false
     t.string "recipient", null: false
     t.string "amount_steemsbd", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "recipient"], name: "steempegged_remove_withdrawals-by-trx_id-action_id-recipient"
   end
 
   create_table "steempegged_withdraws", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "quantity", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "tokens_creates", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "symbol", null: false
     t.string "name", null: false
     t.string "url", default: "", null: false
@@ -80,50 +86,58 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["symbol"], name: "tokens_creates-by-symbol", unique: true
+    t.index ["trx_id", "symbol"], name: "tokens_creates-by-trx_id-symbol"
   end
 
   create_table "tokens_issues", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "symbol", null: false
     t.string "to", null: false
     t.string "quantity", null: false
     t.string "memo", default: "", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "symbol", "to"], name: "tokens_issues-by-trx_id-symbol-to"
+    t.index ["trx_id", "symbol"], name: "tokens_issues-by-trx_id-symbol"
   end
 
   create_table "tokens_transfer_ownerships", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "symbol", null: false
     t.string "to", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "symbol"], name: "tokens_transfer_ownerships-by-trx_id-symbol"
   end
 
   create_table "tokens_transfers", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "symbol", null: false
     t.string "to", null: false
     t.string "quantity", null: false
     t.string "memo", default: "", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "symbol", "to"], name: "tokens_transfers-by-trx_id-symbol-to"
+    t.index ["trx_id", "symbol"], name: "tokens_transfers-by-trx_id-symbol"
   end
 
   create_table "tokens_update_metadata", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "symbol", null: false
     t.text "metadata", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "symbol"], name: "tokens_update_metadata-by-trx_id-symbol"
   end
 
   create_table "tokens_update_urls", force: :cascade do |t|
-    t.string "trx_id", null: false
+    t.integer "trx_id", null: false
     t.string "symbol", null: false
     t.text "url", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "symbol"], name: "tokens_update_urls-by-trx_id-symbol"
   end
 
   create_table "transactions", force: :cascade do |t|
