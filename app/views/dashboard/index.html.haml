@@ -14,4 +14,4 @@
         %samp.card-text.float-right= link_to number_with_delimiter(head_block_num), b_path(head_block_num)
       .card-body.bg-white
         %h3.card-title.lead Tokens:
-        %samp.card-text.float-right= link_to number_with_delimiter(TokensCreate.distinct(:symbol).count), tokens_path
+        %samp.card-text.float-right= link_to number_with_delimiter(TokensCreate.distinct(:symbol).count + 1), tokens_path

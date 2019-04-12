@@ -1,0 +1,12 @@
+%tr
+  %td= token.name.truncate(30)
+  - url = JSON[TokensUpdateMetadata.find_by(symbol: token.symbol).try(:metadata) || '{}'].fetch('url', token.url)
+  - if !!url
+    - url = "https://#{url.sub(/^http(s?):\/\//i, '').strip}"
+    %td.symbol= link_to token.symbol, URI.parse(url).to_s
+  - else
+    %td.symbol= token.symbol
+  %td= link_to token.trx.sender, account_home_path(token.trx.sender)
+  %td= token.precision
+  %td= number_with_delimiter token.max_supply
+  %td= token.trx.timestamp

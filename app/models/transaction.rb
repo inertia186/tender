@@ -3,6 +3,11 @@ class Transaction < ApplicationRecord
     'contract doesn\'t exist'
   ]
   
+  GENESIS_BLOCK = {
+    block_num: 0,
+    ref_steem_block_num: 0
+  }
+  
   has_many :market_buys
   has_many :market_cancels
   has_many :market_sells
@@ -27,7 +32,7 @@ class Transaction < ApplicationRecord
   validates_presence_of :payload
   validates_presence_of :executed_code_hash, unless: :executed_code_hash_exceptions
   validates_presence_of :hash
-  validates_presence_of :database_hash
+  validates_presence_of :database_hash, unless: :database_hash_exceptions
   validates_presence_of :logs
   validates_presence_of :timestamp
   
@@ -55,7 +60,7 @@ class Transaction < ApplicationRecord
     ctx.scan_each(match: pattern) do |key|
       n, b, t, i = key.split(':')
       params = JSON[ctx.get(key)]
-      trx_id = params['transactionId'].split('-')[0]
+      trx_id = params['transactionId'].to_s.split('-')[0]
       b = b.to_i
       i = i.to_i
       
@@ -108,6 +113,10 @@ class Transaction < ApplicationRecord
 private
   def executed_code_hash_exceptions
     (hydrated_logs['errors'] || [] & EXECUTED_CODE_HASH_EXCEPTIONS).any?
+  end
+  
+  def database_hash_exceptions
+    block_num == GENESIS_BLOCK[:block_num]
   end
   
   def parse_contract

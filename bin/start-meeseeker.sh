@@ -10,7 +10,7 @@ export MEESEEKER_EXPIRE_KEYS="-1"
 AT_BLOCK_NUM=`redis-cli get steem_engine:meeseeker:last_block_num`
 
 if [ -z "$AT_BLOCK_NUM" ]; then
-  AT_BLOCK_NUM="1"
+  AT_BLOCK_NUM="0"
 fi
 
 cd /meeseeker
