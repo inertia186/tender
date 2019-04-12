@@ -8,15 +8,16 @@ class TransactionsController < ApplicationController
     
     if !!transactions_params[:account]
       @accounts = [transactions_params[:account]].flatten
+      where_clause = (['trx_id IN(?)'] * 6).join(' OR ')
       
-      trx_ids = Transaction.where(sender: @accounts).limit(1000).order(timestamp: :desc).pluck(:trx_id)
-      trx_ids += TokensIssue.where(to: @accounts).limit(1000).order(timestamp: :desc).pluck(:trx_id)
-      trx_ids += TokensTransferOwnership.where(to: @accounts).limit(1000).order(timestamp: :desc).pluck(:trx_id)
-      trx_ids += SscstoreBuy.where(recipient: @accounts).limit(1000).order(timestamp: :desc).pluck(:trx_id)
-      trx_ids += SteempeggedBuy.where(recipient: @accounts).limit(1000).order(timestamp: :desc).pluck(:trx_id)
-      trx_ids += SteempeggedRemoveWithdrawal.where(recipient: @accounts).limit(1000).order(timestamp: :desc).pluck(:trx_id)
-      
-      @transactions = @transactions.where("trx_id IN(?)", trx_ids)
+      @transactions = @transactions.where(where_clause,
+        Transaction.where(sender: @accounts).select(:trx_id),
+        TokensIssue.where(to: @accounts).select(:trx_id),
+        TokensTransferOwnership.where(to: @accounts).select(:trx_id),
+        SscstoreBuy.where(recipient: @accounts).select(:trx_id),
+        SteempeggedBuy.where(recipient: @accounts).select(:trx_id),
+        SteempeggedRemoveWithdrawal.where(recipient: @accounts).select(:trx_id)
+      )
     end
     
     @transactions = @transactions.paginate(per_page: @per_page, page: @page)
