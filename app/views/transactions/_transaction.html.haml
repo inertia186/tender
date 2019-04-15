@@ -25,4 +25,6 @@
               = render partial: 'error', collection: logs['errors']
         = link_to transaction.trx_id[0..6], tx_path(transaction.trx_id), class: 'tag'
         .foot
-          = link_to "#{time_ago_in_words transaction.timestamp} ago", b_path(transaction.block_num)
+          = link_to b_path(transaction.block_num) do
+            %time{data: {toggle: 'tooltip', placement: 'right'}, title: transaction.timestamp}
+              = transaction.timestamp

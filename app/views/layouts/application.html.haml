@@ -27,8 +27,9 @@
         .container-fluid
           %ul.nav.nav-tabs
             -# %li.nav-item= link_to 'Dashboard', dashboard_index_path, class: 'nav-link' + (controller_name == 'dashboard' ? ' active' : '')
-          - if replaying?
-            .text-center.alert.alert-danger Replay in progress.  Sidechain sync is pending, please check back later.
+          - Rails.cache.fetch('replay_detection', expires_in: 10.minutes) do
+            - if replaying?
+              .text-center.alert.alert-danger{title: "i:#{i = head_block_num} vs. e:#{e = public_steem_engine_blockchain.latest_block_info['blockNumber']}; diff: #{i - e}"} Replay in progress.  Sidechain sync is pending, please check back later.
           = yield
     .card-footer.text-center
       %small

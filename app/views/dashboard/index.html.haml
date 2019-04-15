@@ -1,17 +1,18 @@
-.row
-  .col-sm-9
-    = render partial: '/transactions/transaction', collection: @transactions
+- cache head_block_num do
+  .row
+    .col-sm-9
+      = render partial: '/transactions/transaction', collection: @transactions
 
-    = will_paginate(@transactions, params: {controller: :transactions, action: :index, page: @page, per_page: @per_page}, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
-  .col-sm-3
-    .card.mb-3.shadow-sm
-      %h3.card-header.bg-light Properties
-      .card-body.bg-white
-        %h3.card-title.lead Sidechain Time:
-        %samp.card-text.float-right= Transaction.maximum(:timestamp)
-      .card-body.bg-white
-        %h3.card-title.lead Sidechain Head Block:
-        %samp.card-text.float-right= link_to number_with_delimiter(head_block_num), b_path(head_block_num)
-      .card-body.bg-white
-        %h3.card-title.lead Tokens:
-        %samp.card-text.float-right= link_to number_with_delimiter(TokensCreate.distinct(:symbol).count + 1), tokens_path
+      = will_paginate(@transactions, params: {controller: :transactions, action: :index, page: @page, per_page: @per_page}, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
+    .col-sm-3
+      .card.mb-3.shadow-sm
+        %h3.card-header.bg-light Properties
+        .card-body.bg-white
+          %h3.card-title.lead Sidechain Time:
+          %samp.card-text.float-right= Transaction.maximum(:timestamp)
+        .card-body.bg-white
+          %h3.card-title.lead Sidechain Head Block:
+          %samp.card-text.float-right= link_to number_with_delimiter(head_block_num), b_path(head_block_num)
+        .card-body.bg-white
+          %h3.card-title.lead Tokens:
+          %samp.card-text.float-right= link_to number_with_delimiter(TokensCreate.distinct(:symbol).count + 1), tokens_path

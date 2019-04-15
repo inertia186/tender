@@ -17,7 +17,18 @@
 //= require popper
 //= require bootstrap-sprockets
 //= require json-formatter
+//= require moment
 //= require_tree .
 
 // $(document).on('turbolinks:load', function() {
 // });
+
+$(document).on('turbolinks:load', function() {
+  $('time').each(function() {
+    var time = $(this);
+    
+    if ( time.text().indexOf(time.attr('title')) == -1 ) { return; }
+    
+    time.text(moment(time.text()).fromNow());
+  });
+})

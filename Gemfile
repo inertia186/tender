@@ -47,6 +47,7 @@ gem 'will_paginate', '~> 3.1.7'
 gem 'bootstrap-will_paginate'
 gem 'jquery-rails'
 gem 'json-formatter-rails'
+gem 'momentjs-rails'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -63,6 +64,10 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'rack-mini-profiler', require: false
+  gem 'memory_profiler' # For memory profiling
+  gem 'flamegraph' # For call-stack profiling flamegraphs
+  gem 'stackprof' # For call-stack profiling flamegraphs
   gem 'rb-readline'
 end
 

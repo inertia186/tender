@@ -2,7 +2,14 @@
   %h1
     %span.text-muted>< @
     %span>< #{transactions_params[:account]}
+    
+    - if !!transactions_params[:symbol]
+      = surround ' (', ')' do
+        = transactions_params[:symbol]
+- elsif !!transactions_params[:symbol]
+  %h1= transactions_params[:symbol]
 
-= render partial: 'transaction', collection: @transactions
+- cache [transactions_params, head_block_num] do
+  = render partial: 'transaction', collection: @transactions, cached: true
 
 = will_paginate(@transactions, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
