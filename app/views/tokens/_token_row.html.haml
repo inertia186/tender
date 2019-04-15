@@ -10,3 +10,7 @@
   %td= token.precision
   %td= number_with_delimiter token.max_supply
   %td= token.trx.timestamp
+  %td
+    = link_to transactions_path(symbol: token.symbol) do
+      %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = Transaction.with_symbol(token.symbol).maximum(:timestamp)}
+        = active_at

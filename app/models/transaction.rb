@@ -1,3 +1,5 @@
+require 'active_record/validations'
+
 class Transaction < ApplicationRecord
   EXECUTED_CODE_HASH_EXCEPTIONS = [
     'contract doesn\'t exist'
@@ -8,19 +10,21 @@ class Transaction < ApplicationRecord
     ref_steem_block_num: 0
   }
   
-  has_many :market_buys
-  has_many :market_cancels
-  has_many :market_sells
-  has_many :sscstore_buys
-  has_many :steempegged_buys
-  has_many :steempegged_remove_withdrawals
-  has_many :steempegged_withdraws
-  has_many :tokens_creates
-  has_many :tokens_issues
-  has_many :tokens_transfer_ownerships
-  has_many :tokens_transfers
-  has_many :tokens_update_metadata
-  has_many :tokens_update_urls
+  with_options foreign_key: 'trx_id', dependent: :destroy do |trx|
+    trx.has_many :market_buys
+    trx.has_many :market_cancels
+    trx.has_many :market_sells
+    trx.has_many :sscstore_buys
+    trx.has_many :steempegged_buys
+    trx.has_many :steempegged_remove_withdrawals
+    trx.has_many :steempegged_withdraws
+    trx.has_many :tokens_creates
+    trx.has_many :tokens_issues
+    trx.has_many :tokens_transfer_ownerships
+    trx.has_many :tokens_transfers
+    trx.has_many :tokens_update_metadata, class_name: 'TokensUpdateMetadata'
+    trx.has_many :tokens_update_urls
+  end
   
   validates_presence_of :block_num
   validates_presence_of :ref_steem_block_num
@@ -41,7 +45,7 @@ class Transaction < ApplicationRecord
   validates_uniqueness_of :hash
   validates_uniqueness_of :database_hash, scope: %i(trx_id trx_in_block)
   
-  after_commit :parse_contract
+  after_commit :parse_contract, on: :create
   
   scope :contract, lambda { |contract, options = {}|
     if !!options[:invert]
@@ -52,6 +56,38 @@ class Transaction < ApplicationRecord
   }
   
   scope :with_logs_errors, -> { where("logs LIKE '%\"errors\":%'") }
+  
+  scope :with_account, lambda { |account = nil|
+    accounts = [account].flatten.map(&:downcase)
+    where_clause = (['id IN(?)'] * 8).join(' OR ')
+    
+    where(where_clause,
+      Transaction.where(sender: accounts).select(:id),
+      Transaction.where('logs LIKE ?', "%\"#{account}\"%").select(:id),
+      TokensIssue.where(to: accounts).select(:trx_id),
+      TokensTransfer.where(to: accounts).select(:trx_id),
+      TokensTransferOwnership.where(to: accounts).select(:trx_id),
+      SscstoreBuy.where(recipient: accounts).select(:trx_id),
+      SteempeggedBuy.where(recipient: accounts).select(:trx_id),
+      SteempeggedRemoveWithdrawal.where(recipient: accounts).select(:trx_id),
+    )    
+  }
+  
+  scope :with_symbol, lambda { |symbol = nil|
+    symbol = [symbol].flatten.compact.map(&:upcase)
+    where_clause = (['id IN(?)'] * 8).join(' OR ')
+    
+    where(where_clause,
+      TokensIssue.where(symbol: symbol).select(:trx_id),
+      TokensTransfer.where(symbol: symbol).select(:trx_id),
+      TokensCreate.where(symbol: symbol).select(:trx_id),
+      TokensTransferOwnership.where(symbol:symbol).select(:trx_id),
+      TokensUpdateMetadata.where(symbol: symbol).select(:trx_id),
+      TokensUpdateUrl.where(symbol: symbol).select(:trx_id),
+      MarketBuy.where(symbol: symbol).select(:trx_id),
+      MarketSell.where(symbol: symbol).select(:trx_id),
+    )    
+  }
   
   def self.meeseeker_ingest(&block)
     pattern = 'steem_engine:*:*:*:*'
@@ -152,7 +188,7 @@ private
       
       begin
         klass.create!(params.merge(trx: self))
-      rescue ActiveModel::UnknownAttributeError => e
+      rescue ActiveModel::UnknownAttributeError, ActiveModel::RecordInvalid => e
         raise "Unable to create record (trx_id: #{trx_id}): #{contract}.#{action} (caused by: #{e})"
       end
     end

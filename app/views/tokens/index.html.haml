@@ -9,8 +9,9 @@
           %th Precision
           %th Max Supply
           %th Created
+          %th Activity
       %tbody
-        = render partial: 'token_row', object: @eng_token, as: :token if !!@eng_token
-        = render partial: 'token_row', collection: @tokens, as: :token
+        = render partial: 'token_row', object: @eng_token, as: :token, cached: true if !!@eng_token
+        = render partial: 'token_row', collection: @tokens, as: :token, cached: true
     
     = will_paginate(@transactions, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)

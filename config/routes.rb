@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   get '/issues/:to(/:symbol(/:per_page(/:page))).json', to: 'issues#index', as: :inline_issues, constraints: { to: /([^\/])+/ }
   
   resources :transactions, only: %i(index show)
-  get '@:account', to: 'transactions#index', as: :account_home, constraints: { account: /([^\/])+/ }
+  get '@:account(/:symbol)', to: 'transactions#index', as: :account_home, constraints: { account: /([^\/])+/ }
   get '/tx/:trx_id', to: 'transactions#show', as: :tx
   
   resources :tokens, only: %i(index show)
