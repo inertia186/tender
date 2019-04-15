@@ -70,7 +70,7 @@ class Transaction < ApplicationRecord
       SscstoreBuy.where(recipient: accounts).select(:trx_id),
       SteempeggedBuy.where(recipient: accounts).select(:trx_id),
       SteempeggedRemoveWithdrawal.where(recipient: accounts).select(:trx_id),
-    )    
+    )
   }
   
   scope :with_symbol, lambda { |symbol = nil|
@@ -86,7 +86,31 @@ class Transaction < ApplicationRecord
       TokensUpdateUrl.where(symbol: symbol).select(:trx_id),
       MarketBuy.where(symbol: symbol).select(:trx_id),
       MarketSell.where(symbol: symbol).select(:trx_id),
-    )    
+    )
+  }
+  
+  scope :search, lambda { |options = {}|
+    keywords = [options[:keywords]].flatten.compact.map(&:downcase)
+    keywords = keywords.map { |keyword| "%#{keyword}%"}
+    
+    where_clause = keywords.map do |keyword|
+      <<~DONE
+        block_num LIKE ? OR
+        ref_steem_block_num LIKE ? OR
+        trx_id LIKE ? OR
+        sender LIKE ? OR
+        contract LIKE ? OR
+        action LIKE ? OR
+        LOWER(payload) LIKE ? OR
+        LOWER(logs) LIKE ? OR
+        executed_code_hash LIKE ? OR
+        hash LIKE ? OR
+        database_hash LIKE ? OR
+        timestamp LIKE ?
+      DONE
+    end
+    
+    where(where_clause.join(' OR '), *keywords * 12)
   }
   
   def self.meeseeker_ingest(&block)

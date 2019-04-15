@@ -10,6 +10,12 @@
   %h1= transactions_params[:symbol]
 
 - cache [transactions_params, head_block_num] do
-  = render partial: 'transaction', collection: @transactions, cached: true
-
+  - if @transactions.any?
+    = render partial: 'transaction', collection: @transactions, cached: true
+  - else
+    .jumbotron.text-center
+      %h5.display-5
+        %p No Tranasctions Found
+      %h1 😭
+  
 = will_paginate(@transactions, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
