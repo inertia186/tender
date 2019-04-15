@@ -32,7 +32,7 @@ private
   
   def fields
     [
-      :block_num, :trx_id, :sender, :contract, :action, :payload, :updated_at,
+      :block_num, :trx_id, :sender, :contract, :action, :payload, :logs, :updated_at,
       :timestamp
     ]
   end
