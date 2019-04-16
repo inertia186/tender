@@ -29,6 +29,6 @@ $(document).on('turbolinks:load', function() {
     
     if ( time.text().indexOf(time.attr('title')) == -1 ) { return; }
     
-    time.text(moment(time.text()).fromNow());
+    time.text(moment.utc(time.text(), 'YYYY-MM-DD HH:mm:ss Z').fromNow());
   });
 })
