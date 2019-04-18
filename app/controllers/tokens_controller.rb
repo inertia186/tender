@@ -10,12 +10,15 @@ class TokensController < ApplicationController
     
     @eng_token = if Transaction.any? && @page == 1
       TokensCreate.new(
+        id: 0,
+        trx: Transaction.find_by(trx_id: '0', trx_in_block: 0),
         symbol: 'ENG',
         name: 'Steem Engine Token',
         url: 'https://steem-engine.com',
         precision: 8,
         max_supply: 9007199254740991,
-        trx: Transaction.find_by(trx_id: '0', trx_in_block: 0)
+        updated_at: Time.at(1514793600),
+        created_at: Time.at(1514793600)
       )
     end
   end

@@ -14,5 +14,7 @@ Rails.application.routes.draw do
   resources :blocks, only: %i(show)
   get '/b/:block_num', to: 'blocks#show', as: :b
 
+  get '/.well-known/healthcheck', to: 'health#index', format: :json
+  
   root to: 'dashboard#index'
 end
