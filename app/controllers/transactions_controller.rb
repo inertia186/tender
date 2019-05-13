@@ -5,6 +5,8 @@ class TransactionsController < ApplicationController
     @per_page = (transactions_params[:per_page] || '100').to_i
     @page = (transactions_params[:page] || '1').to_i
     @keywords = transactions_params[:search].to_s.split(' ').reject(&:empty?)
+    @contract = transactions_params[:contract]
+    @contract_action = transactions_params[:contract_action]
     @open_orders = transactions_params[:open_orders]
     @transactions = Transaction.order(timestamp: :desc, trx_in_block: :asc)
     
@@ -34,6 +36,10 @@ class TransactionsController < ApplicationController
       
       @transactions = @transactions.search(keywords: @keywords)
     end
+    
+    @transactions = @transactions.where(contract: @contract) if !!@contract
+    
+    @transactions = @transactions.where(action: @contract_action) if !!@contract_action
     
     if !!@open_orders
       open_sells = []
