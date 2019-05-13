@@ -41,14 +41,59 @@ namespace :tender do
   end
   
   desc 'Verifies there are no block gaps or duplicate transactions on the sidechain.'
-  task :verify_sidechain do
+  task verify_sidechain: :environment do
     block_agent = Radiator::SSC::Blockchain.new(root_url: ENV.fetch('STEEM_ENGINE_NODE_URL'))
-    block_num = 0
+    checkpoints = Checkpoint.all
+    verified_checkpoints = 0
+    
+    checkpoints.find_each do |checkpoint|
+      block = block_agent.block_info(checkpoint.block_num)
+      problem = false
+      
+      if checkpoint.block_hash != block['hash']
+        puts("Expect block_hash: #{checkpoint.block_hash} but got: #{block['hash']}")
+        puts("Problem detected at block_num: #{checkpoint.block_num}")
+        problem = true
+      end
+      
+      actual_trx_id = block.transactions.first.transactionId.to_s.split('-').first
+      
+      if checkpoint.ref_trx_id != actual_trx_id
+        puts("Expect block_hash: #{checkpoint.ref_trx_id} but got: #{actual_trx_id}")
+        puts("Problem detected at block_num: #{checkpoint.block_num}")
+        problem = true
+      end
+      
+      unless !!problem
+        verified_checkpoints += 1
+        puts "Checkpoint verified at block_num: #{checkpoint.block_num}"
+      end
+    end
+    
+    puts "Checkpoints verified: #{verified_checkpoints} of #{checkpoints.count}"
+    
+    block_num = (Checkpoint.maximum(:block_num) || -1) + 1
     previous_hash = nil
     trx_ids = {}
     
     while !!(block = block_agent.block_info(block_num))
       block_num % 1000 == 0 and print '.'
+      
+      if block_num % Checkpoint::CHECKPOINT_LENGTH == 0
+        trx = block.transactions.first
+        
+        if trx.nil?
+          puts "No transactions in block."
+          abort("Problem detected at block_num: #{block_num}")
+        end
+        
+        Checkpoint.create!(
+          block_num: block_num,
+          block_hash: block['hash'],
+          block_timestamp: block['timestamp'],
+          ref_trx_id: trx.transactionId.to_s.split('-').first
+        )
+      end
       
       if !!previous_hash && previous_hash != block.previousHash
         puts "\nprevious_hash:      #{previous_hash}"

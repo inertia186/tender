@@ -12,6 +12,15 @@
 
 ActiveRecord::Schema.define(version: 2019_04_05_155538) do
 
+  create_table "checkpoints", force: :cascade do |t|
+    t.integer "block_num", null: false
+    t.string "block_hash", null: false
+    t.datetime "block_timestamp", null: false
+    t.string "ref_trx_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "market_buys", force: :cascade do |t|
     t.integer "trx_id", null: false
     t.string "symbol", null: false

@@ -1,0 +1,14 @@
+%table.table
+  %thead
+    %tr
+      %th Block Number
+      %th Block Hash
+      %th Block Timestamp
+  %tbody
+    - @checkpoints.each do |checkpoint|
+      %tr
+        %td
+          %code= checkpoint.block_num
+        %td
+          %code= checkpoint.block_hash
+        %td= checkpoint.block_timestamp
