@@ -11,6 +11,8 @@ class Transaction < ApplicationRecord
   }
   
   with_options foreign_key: 'trx_id', dependent: :destroy do |trx|
+    trx.has_many :contract_deploys
+    trx.has_many :contract_updates
     trx.has_many :market_buys
     trx.has_many :market_cancels
     trx.has_many :market_sells
@@ -19,11 +21,15 @@ class Transaction < ApplicationRecord
     trx.has_many :steempegged_remove_withdrawals
     trx.has_many :steempegged_withdraws
     trx.has_many :tokens_creates
+    trx.has_many :tokens_enable_stakings
     trx.has_many :tokens_issues
+    trx.has_many :tokens_stakes
     trx.has_many :tokens_transfer_ownerships
     trx.has_many :tokens_transfers
+    trx.has_many :tokens_unstakes
     trx.has_many :tokens_update_metadata, class_name: 'TokensUpdateMetadata'
     trx.has_many :tokens_update_urls
+    trx.has_many :tokens_update_params, class_name: 'TokensUpdateParams'
   end
   
   validates_presence_of :block_num
@@ -63,7 +69,7 @@ class Transaction < ApplicationRecord
     
     where(where_clause,
       Transaction.where(sender: accounts).select(:id),
-      Transaction.where('logs LIKE ?', "%\"#{account}\"%").select(:id),
+      Transaction.where('logs LIKE ?', "%\"#{accounts[0]}\"%").select(:id),
       TokensIssue.where(to: accounts).select(:trx_id),
       TokensTransfer.where(to: accounts).select(:trx_id),
       TokensTransferOwnership.where(to: accounts).select(:trx_id),
@@ -74,18 +80,24 @@ class Transaction < ApplicationRecord
   }
   
   scope :with_symbol, lambda { |symbol = nil|
-    symbol = [symbol].flatten.compact.map(&:upcase)
-    where_clause = (['id IN(?)'] * 8).join(' OR ')
+    symbols = [symbol].flatten.compact.map(&:upcase)
+    where_clause = (['id IN(?)'] * 12).join(' OR ')
     
     where(where_clause,
-      TokensIssue.where(symbol: symbol).select(:trx_id),
-      TokensTransfer.where(symbol: symbol).select(:trx_id),
-      TokensCreate.where(symbol: symbol).select(:trx_id),
-      TokensTransferOwnership.where(symbol:symbol).select(:trx_id),
-      TokensUpdateMetadata.where(symbol: symbol).select(:trx_id),
-      TokensUpdateUrl.where(symbol: symbol).select(:trx_id),
-      MarketBuy.where(symbol: symbol).select(:trx_id),
-      MarketSell.where(symbol: symbol).select(:trx_id),
+      Transaction.where(contract: 'market', action: 'buy').
+        where('logs LIKE ?', "%\"#{symbols[0]}\"%").except(:order).select(:id),
+      Transaction.where(contract: 'market', action: 'sell').
+        where('logs LIKE ?', "%\"#{symbols[0]}\"%").except(:order).select(:id),
+      TokensIssue.where(symbol: symbols).except(:order).select(:trx_id),
+      TokensStake.where(symbol: symbols).except(:order).select(:trx_id),
+      TokensTransfer.where(symbol: symbols).select(:trx_id),
+      TokensCreate.where(symbol: symbols).select(:trx_id),
+      TokensTransferOwnership.where(symbol: symbols).select(:trx_id),
+      TokensUnstake.where(symbol: symbols).except(:order).select(:trx_id),
+      TokensUpdateMetadata.where(symbol: symbols).select(:trx_id),
+      TokensUpdateUrl.where(symbol: symbols).select(:trx_id),
+      MarketBuy.where(symbol: symbols).select(:trx_id),
+      MarketSell.where(symbol: symbols).select(:trx_id),
     )
   }
   
@@ -212,8 +224,8 @@ private
       
       begin
         klass.create!(params.merge(trx: self))
-      rescue ActiveModel::UnknownAttributeError, ActiveModel::RecordInvalid => e
-        raise "Unable to create record (trx_id: #{trx_id}): #{contract}.#{action} (caused by: #{e})"
+      rescue => e
+        raise "Unable to create record (trx_id: #{trx_id}): #{contract}.#{action} (params: #{params}) (caused by: #{e})"
       end
     end
   end

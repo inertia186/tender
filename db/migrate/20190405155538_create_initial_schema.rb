@@ -23,6 +23,27 @@ class CreateInitialSchema < ActiveRecord::Migration[5.2]
     add_index :transactions, %i(database_hash trx_id trx_in_block), unique: true, name: 'transactions-by-database_hash-trx_id-trx_in_block'
     
     add_index :transactions, %i(block_num trx_id trx_in_block sender contract action timestamp), name: 'transactions-by-trx_id-trx_in_block-sender-contract-action-ti'
+    add_index :transactions, %i(trx_in_block timestamp), name: 'transactions-by-trx_in_block-timestamp'
+    
+    create_table :contract_deploys do |t|
+      t.integer :trx_id, null: false
+      t.string :name, null: false
+      t.string :params, null: false
+      t.text :code, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :contract_deploys, %i(trx_id name), name: 'contract_deploys-by-trx_id-name'
+    
+    create_table :contract_updates do |t|
+      t.integer :trx_id, null: false
+      t.string :name, null: false
+      t.string :params, null: false
+      t.text :code, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :contract_updates, %i(trx_id name), name: 'contract_updates-by-trx_id-name'
     
     create_table :tokens_issues do |t|
       t.integer :trx_id, null: false
@@ -88,6 +109,37 @@ class CreateInitialSchema < ActiveRecord::Migration[5.2]
     
     add_index :tokens_update_urls, %i(trx_id symbol), name: 'tokens_update_urls-by-trx_id-symbol'
     
+    create_table :tokens_enable_stakings do |t|
+      t.integer :trx_id, null: false
+      t.integer :unstaking_cooldown, null: false
+      t.integer :number_transactions, null: false
+      t.timestamps null: false
+    end
+    
+    create_table :tokens_update_params do |t|
+      t.integer :trx_id, null: false
+      t.text :token_creation_fee, null: false
+      t.timestamps null: false
+    end
+    
+    create_table :tokens_stakes do |t|
+      t.integer :trx_id, null: false
+      t.string :symbol, null: false
+      t.string :quantity, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :tokens_stakes, %i(trx_id symbol), name: 'tokens_stakes-by-trx_id-symbol'
+    
+    create_table :tokens_unstakes do |t|
+      t.integer :trx_id, null: false
+      t.string :symbol, null: false
+      t.string :quantity, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :tokens_unstakes, %i(trx_id symbol), name: 'tokens_unstakes-by-trx_id-symbol'
+    
     create_table :market_buys do |t|
       t.integer :trx_id, null: false
       t.string :symbol, null: false
@@ -148,6 +200,14 @@ class CreateInitialSchema < ActiveRecord::Migration[5.2]
     create_table :steempegged_withdraws do |t|
       t.integer :trx_id, null: false
       t.string :quantity, null: false
+      t.timestamps null: false
+    end
+    
+    create_table :checkpoints do |t|
+      t.integer :block_num, null: false
+      t.string :block_hash, null: false
+      t.datetime :block_timestamp, null: false
+      t.string :ref_trx_id, null: false
       t.timestamps null: false
     end
   end
