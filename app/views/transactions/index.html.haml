@@ -1,11 +1,15 @@
 - if !!transactions_params[:account]
+  - if !!transactions_params[:symbol] && !!@token_balance
+    %span.float-right
+      #{transactions_params[:account]}'s
+      balance:
+      %code
+        = number_with_delimiter @token_balance
+        &nbsp;
+        = transactions_params[:symbol]
   %h1
     %span.text-muted>< @
     %span>< #{transactions_params[:account]}
-    
-    - if !!transactions_params[:symbol]
-      = surround ' (', ')' do
-        = transactions_params[:symbol]
 - elsif !!transactions_params[:symbol]
   %h1= transactions_params[:symbol]
 

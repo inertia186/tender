@@ -18,6 +18,12 @@ class TransactionsController < ApplicationController
       @transactions = @transactions.with_symbol(transactions_params[:symbol])
     end
     
+    @token_balance = if !!transactions_params[:account] && !!transactions_params[:symbol]
+      result = token_balance(transactions_params)
+      
+      result.balance if !!result
+    end
+    
     if @keywords.any?
       if @keywords.size == 1
         keyword = @keywords[0]
