@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   
   resources :transactions, only: %i(index show)
   get '@:account(/:symbol)', to: 'transactions#index', as: :account_home, constraints: { account: /([^\/])+/ }
+  get '/open_orders/@:account(/:symbol)', to: 'transactions#open_orders', as: :open_orders, constraints: { account: /([^\/])+/ }
   get '/tx/:trx_id', to: 'transactions#show', as: :tx
   
   resources :tokens, only: %i(index show)

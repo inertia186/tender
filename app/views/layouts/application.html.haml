@@ -23,6 +23,9 @@
                   - if !!(transfers_to = params[:account] || params[:to])
                     - quick_links << link_to("Transfers To: #{transfers_to}", transfers_path(to: transfers_to), class: 'dropdown-item')
                     - quick_links << link_to("Issued To: #{transfers_to}", issues_path(to: transfers_to), class: 'dropdown-item')
+                    - quick_links << link_to("Open Orders: #{transfers_to}", open_orders_path(transfers_to), class: 'dropdown-item')
+                  - if !!(symbol = params[:symbol])
+                    - quick_links << link_to("Open Orders: #{symbol}", open_orders_path(symbol: symbol), class: 'dropdown-item')
                   - if quick_links.any?
                     %button.btn.btn-secondary.dropdown-toggle#dropdownMenuButton{type: 'button', data: {toggle: 'dropdown'}, aria: {haspopup: true, expanded: false}}
                       Quick Links

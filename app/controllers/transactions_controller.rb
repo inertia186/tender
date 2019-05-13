@@ -5,6 +5,7 @@ class TransactionsController < ApplicationController
     @per_page = (transactions_params[:per_page] || '100').to_i
     @page = (transactions_params[:page] || '1').to_i
     @keywords = transactions_params[:search].to_s.split(' ').reject(&:empty?)
+    @open_orders = transactions_params[:open_orders]
     @transactions = Transaction.order(timestamp: :desc, trx_in_block: :asc)
     
     if !!transactions_params[:account]
@@ -34,9 +35,68 @@ class TransactionsController < ApplicationController
       @transactions = @transactions.search(keywords: @keywords)
     end
     
+    if !!@open_orders
+      open_sells = []
+      open_buys = []
+      order_params = {
+        contract: "market",
+        table: "sellBook",
+        query: {
+        },
+        limit: 1000,
+        offset: 0,
+        indexes: [{"index":"timestamp","descending":true}]
+      }
+      
+      if !!transactions_params[:account]
+        account = [transactions_params[:account]].flatten
+        
+        if account.size == 1
+          order_params[:query][:account] = account[0]
+        else
+          order_params[:query][:account] = {'$in': account}
+        end
+      end
+      
+      if !!transactions_params[:symbol]
+        symbol = [transactions_params[:symbol]].flatten
+        
+        if symbol.size == 1
+          order_params[:query][:symbol] = symbol[0]
+        else
+          order_params[:query][:symbol] = {'$in': symbol}
+        end
+      end
+      
+      while (t = steem_engine_contracts.find(order_params.merge(table: 'sellBook'))).any?
+        open_sells += t
+        order_params[:offset] += open_sells.size
+      end
+      
+      order_params[:offset] = 0
+      
+      while (t = steem_engine_contracts.find(order_params.merge(table: 'buyBook'))).any?
+        open_buys += t
+        order_params[:offset] += open_buys.size
+      end
+      
+      trx_ids = open_sells.map{|o| o['txId'].split('-')[0]} + open_buys.map{|o| o['txId'].split('-')[0]}
+      
+      @transactions = @transactions.where(trx_id: trx_ids)
+      @transactions = @transactions.where(contract: 'market').
+        where('timestamp >= ?', 30.days.ago)
+      @transactions = @transactions.where(action: ['buy', 'sell'])
+    end
+    
     @transactions = @transactions.select(fields)
     
     @transactions = @transactions.paginate(per_page: @per_page, page: @page)
+  end
+  
+  def open_orders
+    params[:open_orders] = 'true'
+    index
+    render :index
   end
   
   def show
@@ -47,7 +107,8 @@ class TransactionsController < ApplicationController
   end
 private
   def transactions_params
-    params.permit(:id, :trx_id, :account, :symbol, :search, :per_page, :page)
+    params.permit(:id, :trx_id, :account, :symbol, :search, :contract,
+      :contract_action, :open_orders, :per_page, :page)
   end
   
   def fields
