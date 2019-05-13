@@ -2,7 +2,7 @@ class TokensController < ApplicationController
   helper_method :tokens_params
   
   def index
-    @per_page = (tokens_params[:per_page] || '100').to_i
+    @per_page = (tokens_params[:per_page] || '10').to_i
     @page = (tokens_params[:page] || '1').to_i
     @tokens = TokensCreate.joins(:trx).includes(:trx)
     @tokens = @tokens.order(Transaction.arel_table[:timestamp].asc)
