@@ -103,7 +103,9 @@ class TransactionsController < ApplicationController
       @transactions = @transactions.where(action: ['buy', 'sell'])
     end
     
-    @transactions = @transactions.select(fields)
+    if params[:format] != 'json'
+      @transactions = @transactions.select(fields)
+    end
     
     @transactions = @transactions.paginate(per_page: @per_page, page: @page)
   end
