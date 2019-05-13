@@ -1,4 +1,4 @@
-- cache Transaction.with_symbol([@eng_token.try(:symbol)] + @tokens.pluck(:symbol)).maximum(:timestamp) do
+- cache Transaction.with_symbol(@tokens.pluck(:symbol)).maximum(:timestamp) do
   .row
     .col-sm-12
       %table.table.table-striped
@@ -12,7 +12,6 @@
             %th Created
             %th Activity
         %tbody
-          = render partial: 'token_row', object: @eng_token, as: :token if !!@eng_token
           = render partial: 'token_row', collection: @tokens, as: :token
       
       = will_paginate(@transactions, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
