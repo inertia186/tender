@@ -26,13 +26,13 @@ class TransactionsController < ApplicationController
     
     if @keywords.any?
       if @keywords.size == 1
-        keyword = @keywords[0]
+        keyword = @keywords[0].to_s
         
         if keyword.starts_with? '@'
           redirect_to account_home_url(keyword[1..-1])
           return
-        elsif keyword.size == 40
-          redirect_to tx_url(keyword)
+        elsif (trx_id = keyword.split('-')[0]).size == 40
+          redirect_to tx_url(trx_id)
           return
         elsif keyword.scan(/\D/).empty? && Transaction.where(block_num: keyword).any?
           redirect_to b_url(keyword)
