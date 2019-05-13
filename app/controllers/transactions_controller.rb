@@ -31,6 +31,9 @@ class TransactionsController < ApplicationController
         if keyword.starts_with? '@'
           redirect_to account_home_url(keyword[1..-1])
           return
+        elsif keyword.starts_with? '$'
+          redirect_to transactions_url(symbol: keyword[1..-1])
+          return
         elsif (trx_id = keyword.split('-')[0]).size == 40
           redirect_to tx_url(trx_id)
           return
