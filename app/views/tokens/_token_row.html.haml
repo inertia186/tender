@@ -3,7 +3,7 @@
   - url = JSON[TokensUpdateMetadata.find_by(symbol: token.symbol).try(:metadata) || '{}'].fetch('url', token.url)
   - if !!url
     - url = "https://#{url.sub(/^http(s?):\/\//i, '').strip}"
-    %td.symbol= link_to token.symbol, URI.parse(url).to_s
+    %td.symbol= link_to token.symbol, URI.parse(url).to_s rescue token.symbol
   - else
     %td.symbol= token.symbol
   %td= link_to token.trx.sender, account_home_path(token.trx.sender)
