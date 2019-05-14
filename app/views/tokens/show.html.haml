@@ -1,0 +1,30 @@
+.row
+  .col-sm-12
+    %h1
+      - url = JSON[TokensUpdateMetadata.find_by(symbol: @token.symbol).try(:metadata) || '{}'].fetch('url', @token.url)
+      - if !!url
+        - url = "https://#{url.sub(/^http(s?):\/\//i, '').strip}"
+        %span.symbol= link_to @token.symbol, URI.parse(url).to_s rescue @token.symbol
+      \-
+      = @token.name
+
+    %table.table.table-striped
+      %tbody
+        %tr
+          %th Issuer
+          %td= link_to @token.trx.sender, account_home_path(@token.trx.sender)
+        %tr
+          %th Precision
+          %td= @token.precision
+        %tr
+          %th Max Supply
+          %td= number_with_delimiter @token.max_supply
+        %tr
+          %th Created
+          %td= @token.trx.timestamp
+        %tr
+          %th Activity
+          %td
+            = link_to transactions_path(symbol: @token.symbol) do
+              %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = Transaction.with_symbol(@token.symbol).maximum(:timestamp)}
+                = active_at
