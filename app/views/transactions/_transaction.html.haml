@@ -27,16 +27,37 @@
           = link_to payload['to'], account_home_path(payload['to'])
           %code= payload['memo']
         - elsif transaction.contract == 'tokens' && transaction.action == 'create'
-          created token a token called
+          created a token called
           = link_to payload['name'].present? ? payload['name'] : payload['symbol'], transactions_path(symbol: payload['symbol'])
+          = surround '(', ')' do
+            symbol:
+            = link_to payload['symbol'], transactions_path(symbol: payload['symbol'])          
         - elsif transaction.contract == 'tokens' && transaction.action == 'updateMetadata'
           created updated metadata for
           = link_to payload['name'].present? ? payload['name'] : payload['symbol'], transactions_path(symbol: payload['symbol'])
+        - elsif transaction.contract == 'tokens' && transaction.action == 'enableStaking'
+          enabled staking for
+          = link_to payload['name'].present? ? payload['name'] : payload['symbol'], transactions_path(symbol: payload['symbol'])
+          with unstaking cooldown of
+          = pluralize payload['numberTransactions'], 'transaction'
+          in
+          = pluralize payload['unstakingCooldown'], 'day'
+        - elsif transaction.contract == 'tokens' && transaction.action == 'updateUrl'
+          updated URL for
+          = link_to payload['name'].present? ? payload['name'] : payload['symbol'], transactions_path(symbol: payload['symbol'])
+          to
+          %code= payload['url']
+        - elsif transaction.contract == 'tokens' && transaction.action == 'updateParams'
+          updated params to
+          %code= payload.to_json
         - else
           .badge.badge-primary= transaction.contract.underscore.humanize.downcase
           .badge.badge-primary= transaction.action.underscore.humanize.downcase
           - if transaction.contract == 'market'
-            - unless transaction.action == 'cancel'
+            - if transaction.action == 'cancel'
+              = surround '(', ')' do
+                = link_to "original transaction #{payload['type']}", tx_path(payload['id'])
+            - else
               %code= number_with_delimiter(payload['quantity']) + ' ' + payload['symbol']
               %span.text-muted @
               %code= number_with_delimiter(payload['price']) + ' STEEMP'
