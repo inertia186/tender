@@ -34,11 +34,9 @@
                     .dropdown-menu{aria: {labelledby: 'dropdownMenuButton'}}
                       = quick_links.join.html_safe
                 .form-group
-                  = text_field_tag :search, params[:search], class: 'form-control', style: 'width: 16rem', placeholder: 'Account, transaction, or block.'
+                  = text_field_tag :search, params[:search], class: 'form-control', style: 'width: 16rem', placeholder: 'Account, transaction, or block.', data: {toggle: 'tooltip', placement: 'bottom', html: true}, title: "Note, you can also type: <br /><code>@account</code><br />-or-<br /><code>$symbol</code><br />-or-<br />plain text"
       .card-body
         .container-fluid
-          %ul.nav.nav-tabs
-            -# %li.nav-item= link_to 'Dashboard', dashboard_index_path, class: 'nav-link' + (controller_name == 'dashboard' ? ' active' : '')
           - Rails.cache.fetch('replay_detection', expires_in: 10.minutes) do
             - if replaying?
               .text-center.alert.alert-danger{title: "i:#{i = head_block_num} vs. e:#{e = public_head_block_num}; diff: #{i - e}"} Replay in progress.  Sidechain sync is pending, please check back later.
