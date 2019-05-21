@@ -7,6 +7,27 @@ class TokensController < ApplicationController
     @tokens = TokensCreate.joins(:trx).includes(:trx)
     @tokens = @tokens.order(Transaction.arel_table[:timestamp].asc)
     @tokens = @tokens.paginate(per_page: @per_page, page: @page)
+    
+    if !!params[:only_stake_enabled]
+      @tokens = if params[:only_stake_enabled] == 'true'
+        @tokens.where(symbol: TokensEnableStaking.select(:symbol))
+      else
+        @tokens.where.not(symbol: TokensEnableStaking.select(:symbol))
+      end
+    end
+    
+    if !!params[:only_scot]
+      scot_tokens = JSON[open('https://scot-api.steem-engine.com/config').read]
+      scot_symbols = scot_tokens.map{|token| token['token']}
+      
+      @tokens = if params[:only_scot] == 'true'
+        @tokens.where(symbol: scot_symbols).
+          where(symbol: TokensEnableStaking.select(:symbol))
+      else
+        @tokens.where.not(symbol: scot_symbols).
+          not(symbol: TokensEnableStaking.select(:symbol))
+      end
+    end
   end
   
   def show

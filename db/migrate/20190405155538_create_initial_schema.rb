@@ -111,6 +111,7 @@ class CreateInitialSchema < ActiveRecord::Migration[5.2]
     
     create_table :tokens_enable_stakings do |t|
       t.integer :trx_id, null: false
+      t.string :symbol, null: false
       t.integer :unstaking_cooldown, null: false
       t.integer :number_transactions, null: false
       t.timestamps null: false

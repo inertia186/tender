@@ -120,6 +120,7 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
 
   create_table "tokens_enable_stakings", force: :cascade do |t|
     t.integer "trx_id", null: false
+    t.string "symbol", null: false
     t.integer "unstaking_cooldown", null: false
     t.integer "number_transactions", null: false
     t.datetime "created_at", null: false
