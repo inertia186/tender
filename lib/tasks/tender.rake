@@ -119,4 +119,50 @@ namespace :tender do
     
     puts "\nVerify complete, ending with block: #{block_num}"
   end
+  
+  task find_typo_accounts: :environment do
+    valid_account_names = Transaction.distinct.pluck(:sender)
+    account_names = TokensTransferOwnership.distinct.pluck(:to)
+    account_names = TokensTransfer.distinct.pluck(:to)
+    account_names += TokensIssue.distinct.pluck(:to)
+    account_names = account_names.map(&:downcase).uniq - valid_account_names
+    typo_account_names = {}
+    steem_engine_contracts = Radiator::SSC::Contracts.new(root_url: ENV.fetch('STEEM_ENGINE_NODE_URL', 'https://api.steem-engine.com/rpc'))
+
+    puts 'All accounts: %d ' % account_names.size
+    
+    account_names = account_names.select do |name|
+      !name.include?(' ') && !name.include?('_') && !(name =~ /\.$/) &&
+        !(name =~ /^@/)
+    end
+    
+    puts 'Valid accounts: %d ' % account_names.size
+    
+    api = Radiator::CondenserApi.new
+    
+    account_names.each_slice(1000) do |slice|
+      api.get_accounts(slice) do |accounts|
+        slice -= accounts.map{|a| a.name}
+        print '.'
+      end
+      
+      slice.each do |name|
+        typo_account_names[name] = nil
+      end
+    end
+    
+    puts "\nTypo accounts: %d" % typo_account_names.size
+    
+    typo_account_names.each do |k, v|
+      typo_account_names[k] = steem_engine_contracts.find(
+        contract: :tokens,
+        table: :balances,
+        query: {
+          account: k
+        }
+      ).map{|b| [b['symbol'], b['balance']]}.to_h
+    end
+    
+    puts JSON.pretty_generate typo_account_names
+  end
 end
