@@ -6,20 +6,34 @@ class ApplicationController < ActionController::Base
   
   after_action :close_agents
 private
+  def steem_options
+    @steem_options ||= {
+      url: ENV.fetch('STEEM_NODE_URL', 'https://api.steemit.com'),
+      persist: false
+    }
+  end
+    
+  def steem_engine_options
+    @steem_engine_options ||= {
+      root_url: ENV.fetch('STEEM_ENGINE_NODE_URL', 'https://api.steem-engine.com/rpc'),
+      persist: false
+    }
+  end
+  
   def condenser_api
-    @condenser_api ||= Radiator::CondenserApi.new(url: ENV.fetch('STEEM_NODE_URL', 'https://api.steemit.com'))
+    @condenser_api ||= Radiator::CondenserApi.new(steem_options)
   end
   
   def public_steem_engine_blockchain
-    @public_steem_engine_blockchain ||= Radiator::SSC::Blockchain.new(root_url: 'https://api.steem-engine.com/rpc')
+    @public_steem_engine_blockchain ||= Radiator::SSC::Blockchain.new(steem_engine_options.merge(root_url: 'https://api.steem-engine.com/rpc'))
   end
   
   def steem_engine_blockchain
-    @steem_engine_blockchain ||= Radiator::SSC::Blockchain.new(root_url: ENV.fetch('STEEM_ENGINE_NODE_URL', 'https://api.steem-engine.com/rpc'))
+    @steem_engine_blockchain ||= Radiator::SSC::Blockchain.new(steem_engine_options)
   end
   
   def steem_engine_contracts
-    @steem_engine_contracts ||= Radiator::SSC::Contracts.new(root_url: ENV.fetch('STEEM_ENGINE_NODE_URL', 'https://api.steem-engine.com/rpc'))
+    @steem_engine_contracts ||= Radiator::SSC::Contracts.new(steem_engine_options)
   end
   
   def token_balance(options = {})

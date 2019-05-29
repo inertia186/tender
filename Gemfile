@@ -39,7 +39,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 # Deals with schema use of AR keywords in columns like transaction.hash.
 gem 'safe_attributes'
 
-gem 'radiator', '~> 0.4.5'
+gem 'radiator', '~> 0.4.6'
 
 gem 'haml', '~> 5.0'
 gem 'bootstrap', '~> 4.3.1'
@@ -48,6 +48,7 @@ gem 'bootstrap-will_paginate'
 gem 'jquery-rails'
 gem 'json-formatter-rails'
 gem 'momentjs-rails'
+gem 'kaminari'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
