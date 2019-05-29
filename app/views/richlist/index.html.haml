@@ -1,0 +1,40 @@
+.row
+  .col-sm-12  
+    %table.table.table-striped.table-borderless
+      %thead
+        %tr
+          %th
+            = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :account_name, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+              Account
+              - if @sort_field == :account_name
+                = @sort_order == :desc ? '🔽' : '🔼'
+          %th
+            = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :balance, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+              Balance
+              - if @sort_field == :balance
+                = @sort_order == :desc ? '🔽' : '🔼'
+          - if @stake_enabled
+            %th
+              = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :stake, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+                Stake
+                - if @sort_field == :stake
+                  = @sort_order == :desc ? '🔽' : '🔼'
+            %th
+              = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :pending_unstake, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+                Pending Unstake
+                - if @sort_field == :pending_unstake
+                  = @sort_order == :desc ? '🔽' : '🔼'
+            -# %th= Delegated Stake
+            -# %th= Received Stake
+      %tbody
+        - @richlist.each do |balance|
+          %tr
+            %td= link_to balance['account'], account_home_path(balance['account'])
+            %td= number_with_delimiter "%.#{@token.precision}f" % balance['balance'].to_f || 0.0
+            - if @stake_enabled
+              %td= number_with_delimiter "%.#{@token.precision}f" % balance['stake'].to_f || 0.0
+              %td= number_with_delimiter "%.#{@token.precision}f" % balance['pendingUnstake'].to_f || 0.0
+              -# %td= number_with_delimiter "%.#{@token.precision}f" % balance['delegatedStake'].to_f || 0.0
+              -# %td= number_with_delimiter "%.#{@token.precision}f" % balance['receivedStake'].to_f || 0.0
+
+= will_paginate(@richlist, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
