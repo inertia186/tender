@@ -96,6 +96,7 @@ GEM
     connection_pool (2.2.2)
     crass (1.0.4)
     debug_inspector (0.0.3)
+    diffy (3.3.0)
     erubi (1.8.0)
     eventmachine (1.2.7)
     execjs (2.7.0)
@@ -200,6 +201,7 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
+    rails-highlightjs (9.1.0.2)
     rails-html-sanitizer (1.0.4)
       loofah (~> 2.2, >= 2.2.2)
     railties (5.2.3)
@@ -294,6 +296,7 @@ DEPENDENCIES
   capybara (>= 2.15)
   chromedriver-helper
   coffee-rails (~> 4.2)
+  diffy
   flamegraph
   haml (~> 5.0)
   jbuilder (~> 2.5)
@@ -308,6 +311,7 @@ DEPENDENCIES
   rack-mini-profiler
   radiator (~> 0.4.6)
   rails (~> 5.2.3)
+  rails-highlightjs
   rb-readline
   redis (~> 4.0)
   safe_attributes

@@ -18,21 +18,25 @@
 //= require bootstrap-sprockets
 //= require json-formatter
 //= require moment
+//= require highlight_pack
 //= require_tree .
 
 // $(document).on('turbolinks:load', function() {
 // });
 
 $(document).on('turbolinks:load', function() {
+  
   $('[data-toggle="tooltip"]').tooltip();
-})
-
-$(document).on('turbolinks:load', function() {
+  
   $('time').each(function() {
     var time = $(this);
     
     if ( time.text().indexOf(time.attr('title')) == -1 ) { return; }
     
     time.text(moment.utc(time.text(), 'YYYY-MM-DD HH:mm:ss Z').fromNow());
+  });
+
+  $('pre code').each(function() {
+    hljs.highlightBlock(this);
   });
 })

@@ -48,6 +48,8 @@ gem 'bootstrap-will_paginate'
 gem 'jquery-rails'
 gem 'json-formatter-rails'
 gem 'momentjs-rails'
+gem 'rails-highlightjs'
+gem 'diffy'
 gem 'kaminari'
 
 group :development, :test do
