@@ -1,0 +1,37 @@
+.row
+  - indent = !!@last_contract_id && @last_contract_id == contract.trx_id
+  - @last_contract_id = contract.trx_id
+  .col-sm-12{class: indent ? 'pl-4 pt-0' : 'pt-1'}
+    .op.op-mini.shadow-sm.bg-white.rounded{id: contract.trx_id}
+      %span.action
+        - payload = JSON[contract.payload] and payload.delete('isSignedWithActiveKey')
+        - logs = JSON[contract.logs] rescue {}
+        = link_to contract.sender, account_home_path(contract.sender)
+        = case contract.action
+        - when 'deploy' then 'deployed'
+        - when 'update' then 'updated'
+        - else; contract.action
+        &nbsp;the
+        %code= payload['name']
+        contract
+        - if contract.action == 'deploy'
+          - if contract.trx_id == '0'
+            = link_to 'view code', contract_path(contract.trx_id, contract: payload['name'])
+          - else
+            = link_to 'view code', contract_path(contract.trx_id)
+        - elsif contract.action == 'update'
+          - previous = ContractUpdate.joins(:trx).where('transactions.trx_id <> ? AND transactions.block_num < ?', contract.trx_id, contract.block_num).where(name: payload['name']).limit(1).order(created_at: :desc).first
+          - previous ||= ContractDeploy.where(name: payload['name']).limit(1).order(created_at: :desc).first
+          
+          = link_to 'view code', contract_path(contract.trx_id)
+          
+          - if !!previous
+            \|
+            = link_to 'view diff', contract_diff_path(contract.trx_id, previous.trx.trx_id)
+        - if !!logs['errors']
+          = render partial: 'error', collection: logs['errors']
+        = link_to contract.trx_id[0..6], tx_path(contract.trx_id), class: 'tag'
+        .foot
+          = link_to b_path(contract.block_num) do
+            %time{data: {toggle: 'tooltip', placement: 'right'}, title: contract.timestamp}
+              = contract.timestamp

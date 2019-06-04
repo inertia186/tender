@@ -1,0 +1,12 @@
+%h1 Contracts
+
+- cache [contracts_params, head_block_num] do
+  - if @contracts.any?
+    = render partial: 'contract', collection: @contracts, cached: true
+  - else
+    .jumbotron.text-center
+      %h5.display-5
+        %p No Tranasctions Found
+      %h1 😭
+  
+= will_paginate(@contracts, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)

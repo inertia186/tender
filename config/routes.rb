@@ -16,6 +16,9 @@ Rails.application.routes.draw do
   
   resources :blocks, only: %i(show)
   get '/b/:block_num', to: 'blocks#show', as: :b
+  
+  resources :contracts, only: %i(index show)
+  get '/contracts/:a_trx_id/:b_trx_id', to: 'contracts#diff', as: :contract_diff
 
   resources :checkpoints, only: %i(index)
   

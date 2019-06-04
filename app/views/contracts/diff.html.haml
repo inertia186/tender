@@ -1,0 +1,28 @@
+.row
+  .col-sm-4
+    %h1
+      Diff Contract:
+      %code= @a_contract.name
+  - if !!@a_contract && !!@b_contract
+    .col-sm-8
+      .float-right
+        = surround '(', ')' do
+          %code
+            = @a_contract.trx.trx_id[0..6]
+            &nbsp;vs.&nbsp;
+            = @b_contract.trx.trx_id[0..6]
+
+- if !!@a_contract && !!@b_contract
+  .row
+    .col-sm-12
+      .card.bg-light
+        .card-body
+          - a = Base64.decode64(@a_contract.code)
+          - b = Base64.decode64(@b_contract.code)
+          = Diffy::Diff.new(b, a).to_s(:html_simple).html_safe
+
+- unless !!@a_contract && !!@b_contract
+  .jumbotron.text-center
+    %h5.display-5
+      %p Unable To Perform Diff
+    %h1 😭

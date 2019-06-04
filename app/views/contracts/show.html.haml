@@ -1,0 +1,15 @@
+.row
+  .col-sm-4
+    %h1
+      Contract:
+      %code= @contract.name
+  .col-sm-8
+    .float-right
+      = surround '(', ')' do
+        %code= @contract.trx.trx_id
+.row
+  .col-sm-12
+    .card.bg-light
+      %pre.card-body
+        %code
+          = Base64.decode64(@contract.code)
