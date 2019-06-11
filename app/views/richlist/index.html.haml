@@ -1,8 +1,23 @@
 .row
-  .col-sm-12  
+  .col-sm-3
+    %h1= @symbol
+  .col-sm-9
+    .float-right
+      = pluralize @richlist_count, 'account'
+      - if @stake_enabled
+        %br
+        %code
+          = number_with_delimiter "%.#{@token.precision}f" % @total_staked || 0.0
+          &nbsp;
+          = @symbol
+        staked
+
+.row
+  .col-sm-12
     %table.table.table-striped.table-borderless
       %thead
         %tr
+          %th
           %th
             = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :account_name, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
               Account
@@ -27,8 +42,9 @@
             -# %th= Delegated Stake
             -# %th= Received Stake
       %tbody
-        - @richlist.each do |balance|
+        - @richlist.each_with_index do |balance, index|
           %tr
+            %td= index + 1 + (@page * @per_page) - @per_page
             %td= link_to balance['account'], account_home_path(balance['account'])
             %td= number_with_delimiter "%.#{@token.precision}f" % balance['balance'].to_f || 0.0
             - if @stake_enabled

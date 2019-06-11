@@ -1,3 +1,5 @@
+require 'csv'
+
 class RichlistController < ApplicationController
   helper_method :richlist_params
   
@@ -11,6 +13,7 @@ class RichlistController < ApplicationController
     @token = TokensCreate.find_by!(symbol: @symbol)
     @stake_enabled = TokensEnableStaking.where(symbol: @symbol).any?
     @richlist = []
+    @richlist_count
     
     params.delete(:token_id)
     
@@ -29,6 +32,9 @@ class RichlistController < ApplicationController
       break if sub_list.none?
       @richlist += sub_list
     end
+    
+    @richlist_count = @richlist.size
+    @total_staked = @richlist.map{|b| b['stake'].to_f}.sum
     
     @richlist = case @sort_field
     when :account_name
@@ -58,11 +64,28 @@ class RichlistController < ApplicationController
     else; @richlist
     end
     
-    unless params[:format] == 'json'
-      @richlist = Kaminari.paginate_array(@richlist).page(@page).per(@per_page)
-    end
-    
     @elapsed = Time.now - @start
+    
+    respond_to do |format|
+      format.json { }
+      format.html {
+        @richlist = Kaminari.paginate_array(@richlist).page(@page).per(@per_page)
+      }
+      format.csv do
+        csv_data = CSV.generate(headers: true) do |csv|
+          csv << %w(account balance stake pendingUnstake)
+          
+          @richlist.each do |b|
+            row = [b['account'], b['balance'].to_f, b['stake'].to_f, b['pendingUnstake']]
+            csv << row
+          end
+        end
+
+        datestamp = Date.today.strftime("%d%b%Y%H")
+
+        send_data csv_data, type: 'text/csv; charset=iso-8859-1; header=present', disposition: "attachment; filename=richlist-#{@symbol}-#{datestamp}.csv"
+      end
+    end
   end
 private
   def richlist_params
