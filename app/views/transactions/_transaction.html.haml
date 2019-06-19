@@ -4,8 +4,9 @@
   .col-sm-12{class: indent ? 'pl-4 pt-0' : 'pt-1'}
     .op.op-mini.shadow-sm.bg-white.rounded{id: transaction.trx_id}
       %span.action
-        - payload = JSON[transaction.payload] and payload.delete('isSignedWithActiveKey')
-        - logs = JSON[transaction.logs] rescue {}
+        - payload = transaction.hydrated_payload
+        - payload.delete('isSignedWithActiveKey')
+        - logs = transaction.hydrated_logs
         = link_to transaction.sender, account_home_path(transaction.sender)
         - if transaction.contract == 'null' && transaction.action == 'null'
           deployed new sidechain
