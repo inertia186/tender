@@ -40,6 +40,13 @@ namespace :tender do
     puts 'Finished in: %.3f seconds; Total Transactions: %d (processed %.3f transactions per second)' % [elapsed, Transaction.count, processed_per_second]
   end
   
+  namespace :trx_ingest do
+    desc 'Log filtered for trx_ingest messages.'
+    task :log do
+      exec "cat log/#{Rails.env}.log | grep 'Already ingested:\\|Unable to save \\|Did not persist: '"
+    end
+  end
+  
   desc 'Verifies there are no block gaps or duplicate transactions on the sidechain.'
   task verify_sidechain: :environment do
     block_agent = Radiator::SSC::Blockchain.new(root_url: ENV.fetch('STEEM_ENGINE_NODE_URL'))
