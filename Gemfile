@@ -55,7 +55,9 @@ gem 'kaminari'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'rb-readline'
   gem 'pry', '~> 0.12'
+  gem 'dotenv-rails'
 end
 
 group :development do
@@ -71,15 +73,17 @@ group :development do
   gem 'memory_profiler' # For memory profiling
   gem 'flamegraph' # For call-stack profiling flamegraphs
   gem 'stackprof' # For call-stack profiling flamegraphs
-  gem 'rb-readline'
 end
 
 group :test do
+  # assigns has been extracted to a gem
+  gem 'rails-controller-testing'
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '>= 2.15'
   gem 'selenium-webdriver'
   # Easy installation and use of chromedriver to run system tests with Chrome
   gem 'chromedriver-helper'
+  gem 'simplecov', '~> 0.16'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
