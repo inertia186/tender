@@ -63,7 +63,11 @@ namespace :tender do
         problem = true
       end
       
-      actual_trx_id = block.transactions.first.transactionId.to_s.split('-').first
+      actual_trx_id = if block.transactions.any?
+        block.transactions.first.transactionId.to_s.split('-').first
+      else
+        block.virtualTransactions.first.transactionId.to_s.split('-').first
+      end
       
       if checkpoint.ref_trx_id != actual_trx_id
         puts("Expect block_hash: #{checkpoint.ref_trx_id} but got: #{actual_trx_id}")
@@ -87,7 +91,11 @@ namespace :tender do
       block_num % 1000 == 0 and print '.'
       
       if block_num % Checkpoint::CHECKPOINT_LENGTH == 0
-        trx = block.transactions.first
+        trx = if block.transactions.any?
+          block.transactions.first
+        else
+          block.virtualTransactions.first
+        end
         
         if trx.nil?
           puts "No transactions in block."
