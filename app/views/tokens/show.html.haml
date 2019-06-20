@@ -15,7 +15,7 @@
           %td= link_to @token.trx.sender, account_home_path(@token.trx.sender)
         %tr
           %th Precision
-          %td= @token.precision
+          %td= token_precision(@token)
         %tr
           %th Max Supply
           %td= number_with_delimiter @token.max_supply

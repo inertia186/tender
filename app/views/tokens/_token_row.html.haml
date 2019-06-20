@@ -7,7 +7,7 @@
   - else
     %td.symbol= token.symbol
   %td= link_to token.trx.sender, account_home_path(token.trx.sender)
-  %td= token.precision
+  %td= token_precision(token)
   %td= number_with_delimiter token.max_supply
   %td= token.trx.timestamp
   %td
