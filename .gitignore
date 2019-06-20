@@ -16,6 +16,7 @@
 /tmp/*
 !/log/.keep
 !/tmp/.keep
+/coverage
 
 # Ignore uploaded files in development
 /storage/*
@@ -28,3 +29,5 @@
 .byebug_history
 
 /.ruby-version
+/.env
+
