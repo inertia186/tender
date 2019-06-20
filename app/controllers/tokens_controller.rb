@@ -21,7 +21,7 @@ class TokensController < ApplicationController
     end
     
     if !!params[:only_scot]
-      scot_tokens = JSON[open('https://scot-api.steem-engine.com/config').read]
+      scot_tokens = JSON[open(ENV.fetch('SCOT_API_URL', 'https://scot-api.steem-engine.com') + '/config').read]
       scot_symbols = scot_tokens.map{|token| token['token']}
       
       @tokens = if params[:only_scot] == 'true'
