@@ -7,7 +7,7 @@ class CheckpointsController < ApplicationController
     @elapsed = Time.now - @start
   end
 private
-  def blocks_params
+  def checkpoints_params
     params.permit()
   end
 end
