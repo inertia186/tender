@@ -105,6 +105,22 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "tokens_cancel_unstakes", force: :cascade do |t|
+    t.integer "trx_id", null: false
+    t.string "tx_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trx_id", "tx_id"], name: "tokens_cancel_unstakes-by-trx_id-tx_id"
+    t.index ["trx_id"], name: "tokens_cancel_unstakes-by-trx_id"
+  end
+
+  create_table "tokens_check_pending_unstakes", force: :cascade do |t|
+    t.integer "trx_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trx_id"], name: "tokens_check_pending_unstakes-by-trx_id"
+  end
+
   create_table "tokens_creates", force: :cascade do |t|
     t.integer "trx_id", null: false
     t.string "symbol", null: false
@@ -116,6 +132,27 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
     t.datetime "updated_at", null: false
     t.index ["symbol"], name: "tokens_creates-by-symbol", unique: true
     t.index ["trx_id", "symbol"], name: "tokens_creates-by-trx_id-symbol"
+  end
+
+  create_table "tokens_delegates", force: :cascade do |t|
+    t.integer "trx_id", null: false
+    t.string "to", null: false
+    t.string "symbol", null: false
+    t.string "quantity", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trx_id", "to", "symbol"], name: "tokens_delegates-by-to-symbol"
+    t.index ["trx_id"], name: "tokens_delegates-by-trx_id"
+  end
+
+  create_table "tokens_enable_delegations", force: :cascade do |t|
+    t.integer "trx_id", null: false
+    t.string "symbol", null: false
+    t.integer "undelegation_cooldown", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trx_id", nil, "symbol"], name: "tokens_enable_delegations-by-symbol"
+    t.index ["trx_id"], name: "tokens_enable_delegations-by-trx_id"
   end
 
   create_table "tokens_enable_stakings", force: :cascade do |t|
@@ -157,6 +194,17 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
     t.index ["trx_id", "symbol"], name: "tokens_transfer_ownerships-by-trx_id-symbol"
   end
 
+  create_table "tokens_transfer_to_contracts", force: :cascade do |t|
+    t.integer "trx_id", null: false
+    t.string "to", null: false
+    t.string "symbol", null: false
+    t.string "quantity", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trx_id", "to", "symbol"], name: "tokens_transfer_to_contracts-by-to-symbol"
+    t.index ["trx_id"], name: "tokens_transfer_to_contracts-by-trx_id"
+  end
+
   create_table "tokens_transfers", force: :cascade do |t|
     t.integer "trx_id", null: false
     t.string "symbol", null: false
@@ -167,6 +215,17 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
     t.datetime "updated_at", null: false
     t.index ["trx_id", "symbol", "to"], name: "tokens_transfers-by-trx_id-symbol-to"
     t.index ["trx_id", "symbol"], name: "tokens_transfers-by-trx_id-symbol"
+  end
+
+  create_table "tokens_undelegates", force: :cascade do |t|
+    t.integer "trx_id", null: false
+    t.string "from", null: false
+    t.string "symbol", null: false
+    t.string "quantity", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trx_id", "from", "symbol"], name: "tokens_undelegates-by-from-symbol"
+    t.index ["trx_id"], name: "tokens_undelegates-by-trx_id"
   end
 
   create_table "tokens_unstakes", force: :cascade do |t|
@@ -192,6 +251,16 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
     t.text "token_creation_fee", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "tokens_update_precisions", force: :cascade do |t|
+    t.integer "trx_id", null: false
+    t.string "symbol", null: false
+    t.integer "precision", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trx_id", nil, "symbol"], name: "tokens_update_precisions-by-to-symbol"
+    t.index ["trx_id"], name: "tokens_update_precisions-by-trx_id"
   end
 
   create_table "tokens_update_urls", force: :cascade do |t|
@@ -223,7 +292,7 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
     t.index ["block_num", "trx_id", "trx_in_block"], name: "transactions-by-block_num-trx_id-trx_in_block", unique: true
     t.index ["database_hash", "trx_id", "trx_in_block"], name: "transactions-by-database_hash-trx_id-trx_in_block", unique: true
     t.index ["hash"], name: "transactions-by-hash", unique: true
-    t.index ["trx_id", "trx_in_block"], name: "transactions-by-trx_id-trx_in_block", unique: true
+    t.index ["trx_id", "trx_in_block"], name: "transactions-by-trx_id-trx_in_block"
     t.index ["trx_in_block", "timestamp"], name: "transactions-by-trx_in_block-timestamp"
   end
 

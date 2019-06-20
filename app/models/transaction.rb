@@ -10,6 +10,8 @@ class Transaction < ApplicationRecord
     ref_steem_block_num: 0
   }
   
+  VIRTUAL_TRX_ID = '0000000000000000000000000000000000000000'
+  
   with_options foreign_key: 'trx_id', dependent: :destroy do |trx|
     trx.has_many :contract_deploys
     trx.has_many :contract_updates
@@ -20,16 +22,23 @@ class Transaction < ApplicationRecord
     trx.has_many :steempegged_buys
     trx.has_many :steempegged_remove_withdrawals
     trx.has_many :steempegged_withdraws
+    trx.has_many :tokens_cancel_unstakes
+    trx.has_many :tokens_check_pending_unstakes, class_name: 'TokensCheckPendingUnstakes'
     trx.has_many :tokens_creates
+    trx.has_many :tokens_delegates
+    trx.has_many :tokens_enable_delegations
     trx.has_many :tokens_enable_stakings
     trx.has_many :tokens_issues
     trx.has_many :tokens_stakes
     trx.has_many :tokens_transfer_ownerships
+    trx.has_many :tokens_transfer_to_contracts
     trx.has_many :tokens_transfers
+    trx.has_many :tokens_undelegates
     trx.has_many :tokens_unstakes
     trx.has_many :tokens_update_metadata, class_name: 'TokensUpdateMetadata'
-    trx.has_many :tokens_update_urls
     trx.has_many :tokens_update_params, class_name: 'TokensUpdateParams'
+    trx.has_many :tokens_update_precisions
+    trx.has_many :tokens_update_urls
   end
   
   validates_presence_of :block_num
@@ -39,7 +48,7 @@ class Transaction < ApplicationRecord
   validates_presence_of :sender
   validates_presence_of :contract
   validates_presence_of :action
-  validates_presence_of :payload
+  validates_presence_of :payload, unless: :virtual?
   validates_presence_of :executed_code_hash, unless: :executed_code_hash_exceptions
   validates_presence_of :hash
   validates_presence_of :database_hash, unless: :database_hash_exceptions
@@ -47,7 +56,7 @@ class Transaction < ApplicationRecord
   validates_presence_of :timestamp
   
   validates_uniqueness_of :block_num, scope: %i(trx_id trx_in_block)
-  validates_uniqueness_of :trx_in_block, scope: :trx_id
+  validates_uniqueness_of :trx_in_block, scope: :trx_id, unless: :virtual?
   validates_uniqueness_of :hash
   validates_uniqueness_of :database_hash, scope: %i(trx_id trx_in_block)
   
@@ -61,18 +70,27 @@ class Transaction < ApplicationRecord
     end
   }
   
-  scope :with_logs_errors, -> { where("logs LIKE '%\"errors\":%'") }
+  scope :with_logs_errors, lambda { |with_logs_errors = true|
+    if !!with_logs_errors
+      where("logs LIKE '%\"errors\":%'")
+    else
+      where("logs NOT LIKE '%\"errors\":%'")
+    end
+  }
   
   scope :with_account, lambda { |account = nil|
     accounts = [account].flatten.map(&:downcase)
-    where_clause = (['id IN(?)'] * 8).join(' OR ')
+    where_clause = (['id IN(?)'] * 11).join(' OR ')
     
     where(where_clause,
       Transaction.where(sender: accounts).select(:id),
-      Transaction.where('logs LIKE ?', "%\"#{accounts[0]}\"%").select(:id),
+      Transaction.where('logs LIKE ?', "%\"#{accounts[0]}\"%").select(:id), # FIXME this matches on non-accounts
+      TokensDelegate.where(to: accounts).select(:trx_id),
       TokensIssue.where(to: accounts).select(:trx_id),
       TokensTransfer.where(to: accounts).select(:trx_id),
       TokensTransferOwnership.where(to: accounts).select(:trx_id),
+      TokensTransferToContract.where(to: accounts).select(:trx_id),
+      TokensUndelegate.where(from: accounts).select(:trx_id),
       SscstoreBuy.where(recipient: accounts).select(:trx_id),
       SteempeggedBuy.where(recipient: accounts).select(:trx_id),
       SteempeggedRemoveWithdrawal.where(recipient: accounts).select(:trx_id),
@@ -81,20 +99,25 @@ class Transaction < ApplicationRecord
   
   scope :with_symbol, lambda { |symbol = nil|
     symbols = [symbol].flatten.compact.map(&:upcase)
-    where_clause = (['id IN(?)'] * 12).join(' OR ')
+    where_clause = (['id IN(?)'] * 17).join(' OR ')
     
     where(where_clause,
       Transaction.where(contract: 'market', action: 'buy').
-        where('logs LIKE ?', "%\"#{symbols[0]}\"%").except(:order).select(:id),
+        where('logs LIKE ?', "%\"#{symbols[0]}\"%").except(:order).select(:id), # FIXME this matches on non-symbols
       Transaction.where(contract: 'market', action: 'sell').
-        where('logs LIKE ?', "%\"#{symbols[0]}\"%").except(:order).select(:id),
+        where('logs LIKE ?', "%\"#{symbols[0]}\"%").except(:order).select(:id), # FIXME this matches on non-symbols
+      TokensDelegate.where(symbol: symbols).except(:order).select(:trx_id),
+      TokensEnableDelegation.where(symbol: symbols).except(:order).select(:trx_id),
       TokensIssue.where(symbol: symbols).except(:order).select(:trx_id),
       TokensStake.where(symbol: symbols).except(:order).select(:trx_id),
       TokensTransfer.where(symbol: symbols).select(:trx_id),
+      TokensUndelegate.where(symbol: symbols).select(:trx_id),
       TokensCreate.where(symbol: symbols).select(:trx_id),
       TokensTransferOwnership.where(symbol: symbols).select(:trx_id),
+      TokensTransferToContract.where(symbol: symbols).select(:trx_id),
       TokensUnstake.where(symbol: symbols).except(:order).select(:trx_id),
       TokensUpdateMetadata.where(symbol: symbols).select(:trx_id),
+      TokensUpdatePrecision.where(symbol: symbols).select(:trx_id),
       TokensUpdateUrl.where(symbol: symbols).select(:trx_id),
       MarketBuy.where(symbol: symbols).select(:trx_id),
       MarketSell.where(symbol: symbols).select(:trx_id),
@@ -123,6 +146,14 @@ class Transaction < ApplicationRecord
     end
     
     where(where_clause.join(' OR '), *keywords * 12)
+  }
+  
+  scope :virtual, lambda { |virtual = true|
+    if virtual
+      where(trx_id: VIRTUAL_TRX_ID)
+    else
+      where.not(trx_id: VIRTUAL_TRX_ID)
+    end
   }
   
   def self.meeseeker_ingest(&block)
@@ -175,6 +206,18 @@ class Transaction < ApplicationRecord
     end
   end
   
+  def to_param
+    if trx_in_block == 0
+      "#{trx_id}"
+    else
+      "#{trx_id}-#{trx_in_block}"
+    end
+  end
+  
+  def virtual?
+    trx_id == VIRTUAL_TRX_ID
+  end
+  
   def hydrated_payload
     @hydrated_payload ||= JSON[payload] rescue {}
   end
@@ -212,6 +255,7 @@ private
       params.delete('isSignedWithActiveKey')
       params['action_type'] = params.delete('type') if !!params['type']
       params['action_id'] = params.delete('id') if !!params['id']
+      params['tx_id'] = params.delete('txID') if !!params['txID']
       params.deep_transform_keys!(&:underscore)
       params.select!{ |k, _v| klass.attribute_names.index(k) }
       

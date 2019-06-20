@@ -19,7 +19,7 @@ class CreateInitialSchema < ActiveRecord::Migration[5.2]
     
     add_index :transactions, :hash, unique: true, name: 'transactions-by-hash'
     add_index :transactions, %i(block_num trx_id trx_in_block), unique: true, name: 'transactions-by-block_num-trx_id-trx_in_block'
-    add_index :transactions, %i(trx_id trx_in_block), unique: true, name: 'transactions-by-trx_id-trx_in_block'
+    add_index :transactions, %i(trx_id trx_in_block), name: 'transactions-by-trx_id-trx_in_block'
     add_index :transactions, %i(database_hash trx_id trx_in_block), unique: true, name: 'transactions-by-database_hash-trx_id-trx_in_block'
     
     add_index :transactions, %i(block_num trx_id trx_in_block sender contract action timestamp), name: 'transactions-by-trx_id-trx_in_block-sender-contract-action-ti'
@@ -140,6 +140,75 @@ class CreateInitialSchema < ActiveRecord::Migration[5.2]
     end
     
     add_index :tokens_unstakes, %i(trx_id symbol), name: 'tokens_unstakes-by-trx_id-symbol'
+    
+    create_table :tokens_cancel_unstakes do |t|
+      t.integer :trx_id, null: false
+      t.string :tx_id, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :tokens_cancel_unstakes, %i(trx_id), name: 'tokens_cancel_unstakes-by-trx_id'
+    add_index :tokens_cancel_unstakes, %i(trx_id tx_id), name: 'tokens_cancel_unstakes-by-trx_id-tx_id'
+    
+    create_table :tokens_check_pending_unstakes do |t|
+      t.integer :trx_id, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :tokens_check_pending_unstakes, %i(trx_id), name: 'tokens_check_pending_unstakes-by-trx_id'
+    
+    create_table :tokens_delegates do |t|
+      t.integer :trx_id, null: false
+      t.string :to, null: false
+      t.string :symbol, null: false
+      t.string :quantity, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :tokens_delegates, %i(trx_id), name: 'tokens_delegates-by-trx_id'
+    add_index :tokens_delegates, %i(trx_id to symbol), name: 'tokens_delegates-by-to-symbol'
+    
+    create_table :tokens_enable_delegations do |t|
+      t.integer :trx_id, null: false
+      t.string :symbol, null: false
+      t.integer :undelegation_cooldown, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :tokens_enable_delegations, %i(trx_id), name: 'tokens_enable_delegations-by-trx_id'
+    add_index :tokens_enable_delegations, %i(trx_id to symbol), name: 'tokens_enable_delegations-by-symbol'
+    
+    create_table :tokens_transfer_to_contracts do |t|
+      t.integer :trx_id, null: false
+      t.string :to, null: false
+      t.string :symbol, null: false
+      t.string :quantity, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :tokens_transfer_to_contracts, %i(trx_id), name: 'tokens_transfer_to_contracts-by-trx_id'
+    add_index :tokens_transfer_to_contracts, %i(trx_id to symbol), name: 'tokens_transfer_to_contracts-by-to-symbol'
+    
+    create_table :tokens_undelegates do |t|
+      t.integer :trx_id, null: false
+      t.string :from, null: false
+      t.string :symbol, null: false
+      t.string :quantity, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :tokens_undelegates, %i(trx_id), name: 'tokens_undelegates-by-trx_id'
+    add_index :tokens_undelegates, %i(trx_id from symbol), name: 'tokens_undelegates-by-from-symbol'
+    
+    create_table :tokens_update_precisions do |t|
+      t.integer :trx_id, null: false
+      t.string :symbol, null: false
+      t.integer :precision, null: false
+      t.timestamps null: false
+    end
+    
+    add_index :tokens_update_precisions, %i(trx_id), name: 'tokens_update_precisions-by-trx_id'
+    add_index :tokens_update_precisions, %i(trx_id to symbol), name: 'tokens_update_precisions-by-to-symbol'
     
     create_table :market_buys do |t|
       t.integer :trx_id, null: false

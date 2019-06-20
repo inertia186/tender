@@ -1,3 +1,4 @@
+# See: https://github.com/harpagon210/steemsmartcontracts/wiki/Tokens-Contract#enablestaking
 class TokensEnableStaking < ApplicationRecord
   belongs_to :trx, class_name: 'Transaction', foreign_key: 'trx_id'
   
