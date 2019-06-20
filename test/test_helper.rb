@@ -1,4 +1,12 @@
 ENV['RAILS_ENV'] ||= 'test'
+
+if !!ENV["HELL_ENABLED"]
+  require 'simplecov'
+  
+  SimpleCov.start
+  SimpleCov.merge_timeout 3600
+end
+
 require_relative '../config/environment'
 require 'rails/test_help'
 

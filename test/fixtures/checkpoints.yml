@@ -1,0 +1,7 @@
+genesis:
+  block_num: 0
+  block_hash: d23f9718030a24d7192d87d9cb63fbe61a817f9e4e1cb1fce1a2640a4b404b6e
+  block_timestamp: '2018-06-01T00:00:00'
+  ref_trx_id: '0'
+  created_at: '2018-06-01T00:00:00'
+  updated_at: '2018-06-01T00:00:00'
