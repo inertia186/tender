@@ -39,8 +39,16 @@
                 Pending Unstake
                 - if @sort_field == :pending_unstake
                   = @sort_order == :desc ? '🔽' : '🔼'
-            -# %th= Delegated Stake
-            -# %th= Received Stake
+            %th
+              = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :delegations_out, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+                Delegated Stake
+                - if @sort_field == :delegations_out
+                  = @sort_order == :desc ? '🔽' : '🔼'
+            %th
+              = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :delegations_in, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+                Received Stake
+                - if @sort_field == :delegations_in
+                  = @sort_order == :desc ? '🔽' : '🔼'
       %tbody
         - @richlist.each_with_index do |balance, index|
           %tr
@@ -50,7 +58,11 @@
             - if @stake_enabled
               %td= number_with_delimiter "%.#{@token.precision}f" % balance['stake'].to_f || 0.0
               %td= number_with_delimiter "%.#{@token.precision}f" % balance['pendingUnstake'].to_f || 0.0
-              -# %td= number_with_delimiter "%.#{@token.precision}f" % balance['delegatedStake'].to_f || 0.0
-              -# %td= number_with_delimiter "%.#{@token.precision}f" % balance['receivedStake'].to_f || 0.0
+              %td
+                = link_to account_home_path(balance['account'], symbol: @symbol, contract: 'tokens', contract_action: 'delegate') do
+                  = number_with_delimiter "%.#{@token.precision}f" % balance['delegationsOut'].to_f || 0.0
+              %td
+                = link_to account_home_path(balance['account'], symbol: @symbol, contract: 'tokens', contract_action: 'delegate') do
+                  = number_with_delimiter "%.#{@token.precision}f" % balance['delegationsIn'].to_f || 0.0
 
 = will_paginate(@richlist, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)

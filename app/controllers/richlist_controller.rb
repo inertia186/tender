@@ -53,6 +53,14 @@ class RichlistController < ApplicationController
       @richlist.sort_by do |balance|
         balance['pendingUnstake'].to_f
       end
+    when :delegations_out
+      @richlist.sort_by do |balance|
+        balance['delegationsOut'].to_f
+      end
+    when :delegations_in
+      @richlist.sort_by do |balance|
+        balance['delegationsIn'].to_f
+      end
     else
       @richlist.sort_by do |balance|
         balance['balance'].to_f + balance['stake'].to_f + balance['pendingUnstake'].to_f
@@ -73,7 +81,7 @@ class RichlistController < ApplicationController
       }
       format.csv do
         csv_data = CSV.generate(headers: true) do |csv|
-          csv << %w(account balance stake pendingUnstake)
+          csv << %w(account balance stake pendingUnstake delegationsOut delegationsIn)
           
           @richlist.each do |b|
             row = [b['account'], b['balance'].to_f, b['stake'].to_f, b['pendingUnstake']]
