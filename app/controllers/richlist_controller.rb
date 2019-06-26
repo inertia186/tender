@@ -11,7 +11,7 @@ class RichlistController < ApplicationController
     @sort_order = (params[:sort_order] || 'desc').to_sym
     @symbol = richlist_params.delete(:symbol) || richlist_params.delete(:token_id)
     @token = TokensCreate.find_by!(symbol: @symbol)
-    @stake_enabled = TokensEnableStaking.where(symbol: @symbol).any?
+    @stake_enabled = false
     @richlist = []
     @richlist_count
     
@@ -36,6 +36,8 @@ class RichlistController < ApplicationController
     @richlist_count = @richlist.size
     @total_staked = @richlist.map{|b| b['stake'].to_f}.sum
     @total_staked_accounts = @richlist.select{|b| b['stake'].to_f > 0.0}.size
+    
+    @stake_enabled = @total_staked_accounts > 0
     
     @richlist = case @sort_field
     when :account_name
