@@ -35,6 +35,7 @@ class RichlistController < ApplicationController
     
     @richlist_count = @richlist.size
     @total_staked = @richlist.map{|b| b['stake'].to_f}.sum
+    @total_staked_accounts = @richlist.select{|b| b['stake'].to_f > 0.0}.size
     
     @richlist = case @sort_field
     when :account_name

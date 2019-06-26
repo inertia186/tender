@@ -10,7 +10,8 @@
           = number_with_delimiter "%.#{@token.precision}f" % @total_staked || 0.0
           &nbsp;
           = @symbol
-        staked
+        staked by
+        = pluralize(@total_staked_accounts || 0, 'account')
 
 .row
   .col-sm-12
