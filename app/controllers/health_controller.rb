@@ -12,7 +12,7 @@ class HealthController < ApplicationController
       @steem_head_block_num = dgpo.head_block_number
     end
     
-    @steem_engine_head_block_num = Transaction.maximum(:block_num)
+    @steem_engine_head_block_num = Transaction.distinct(:block_num).count(:block_num) - 1
     
     steem_block_num_diff = @steem_head_block_num - steem_block_num
     steem_engine_block_num_diff = @steem_engine_head_block_num - steem_engine_block_num
