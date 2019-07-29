@@ -9,7 +9,7 @@ class RichlistController < ApplicationController
     @page = (params[:page] || '1').to_i
     @sort_field = (params[:sort_field] || 'total_balance').to_sym
     @sort_order = (params[:sort_order] || 'desc').to_sym
-    @symbol = richlist_params.delete(:symbol) || richlist_params.delete(:token_id)
+    @symbol = (richlist_params.delete(:symbol) || richlist_params.delete(:token_id)).to_s.upcase
     @token = TokensCreate.find_by!(symbol: @symbol)
     @stake_enabled = false
     @richlist = []

@@ -15,7 +15,8 @@ class TransactionsController < ApplicationController
     end
     
     if !!transactions_params[:symbol]
-      @transactions = @transactions.with_symbol(transactions_params[:symbol])
+      symbol = [transactions_params[:symbol]].flatten.compact.map(&:upcase)
+      @transactions = @transactions.with_symbol(symbol)
     end
     
     @token_balance = if !!transactions_params[:account] && !!transactions_params[:symbol]
@@ -74,7 +75,7 @@ class TransactionsController < ApplicationController
       end
       
       if !!transactions_params[:symbol]
-        symbol = [transactions_params[:symbol]].flatten
+        symbol = [transactions_params[:symbol]].flatten.compact.map(&:upcase)
         
         if symbol.size == 1
           order_params[:query][:symbol] = symbol[0]

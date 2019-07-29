@@ -36,7 +36,7 @@ class TokensController < ApplicationController
   
   def show
     @start = Time.now
-    @symbol = tokens_params[:symbol] || tokens_params[:id]
+    @symbol = (tokens_params[:symbol] || tokens_params[:id]).to_s.upcase
     @token = TokensCreate.find_by!(symbol: @symbol)
     @elapsed = Time.now - @start
   end
