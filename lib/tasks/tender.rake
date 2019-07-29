@@ -49,9 +49,11 @@ namespace :tender do
   
   desc 'Verifies there are no block gaps or duplicate transactions on the sidechain.'
   task verify_sidechain: :environment do
-    block_agent = Radiator::SSC::Blockchain.new(root_url: ENV.fetch('STEEM_ENGINE_NODE_URL'))
+    block_agent = Radiator::SSC::Blockchain.new(root_url: ENV.fetch('STEEM_ENGINE_NODE_URL'), persist: false)
     checkpoints = Checkpoint.all
     verified_checkpoints = 0
+    public_steem_engine_node_url = ENV.fetch('PUBLIC_STEEM_ENGINE_NODE_URL', 'https://api.steem-engine.com/rpc', persist: false)
+    public_block_agent = Radiator::SSC::Blockchain.new(root_url: public_steem_engine_node_url)
     
     checkpoints.find_each do |checkpoint|
       block = block_agent.block_info(checkpoint.block_num)
@@ -90,7 +92,7 @@ namespace :tender do
     while !!(block = block_agent.block_info(block_num))
       block_num % 1000 == 0 and print '.'
       
-      if block_num % Checkpoint::CHECKPOINT_LENGTH == 0
+      if true#block_num % Checkpoint::CHECKPOINT_LENGTH == 0
         trx = if block.transactions.any?
           block.transactions.first
         else
@@ -98,7 +100,15 @@ namespace :tender do
         end
         
         if trx.nil?
-          puts "No transactions in block."
+          puts "\nNo transactions in block."
+          abort("Problem detected at block_num: #{block_num}")
+        end
+        
+        public_block = public_block_agent.block_info(block_num)
+        
+        if block['hash'] != public_block['hash']
+          puts("\nProblem comparing #{ENV['STEEM_ENGINE_NODE_URL']} and #{public_steem_engine_node_url}")
+          puts("Expect block_hash: #{block['hash']} but got: #{public_block['hash']}")
           abort("Problem detected at block_num: #{block_num}")
         end
         
