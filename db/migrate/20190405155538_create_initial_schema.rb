@@ -117,6 +117,8 @@ class CreateInitialSchema < ActiveRecord::Migration[5.2]
       t.timestamps null: false
     end
     
+    add_index :tokens_enable_stakings, %i(trx_id symbol), name: 'tokens_enable_stakings-by-trx_id-symbol'
+    
     create_table :tokens_update_params do |t|
       t.integer :trx_id, null: false
       t.text :token_creation_fee, null: false
@@ -237,7 +239,7 @@ class CreateInitialSchema < ActiveRecord::Migration[5.2]
       t.timestamps null: false
     end
     
-    add_index :market_cancels, %i(trx_id symbol), name: 'market_cancels-by-trx_id-symbol'
+    add_index :market_cancels, %i(trx_id action_type action_id), name: 'market_cancels-by-trx_id-action_type-action_id'
     
     create_table :sscstore_buys do |t|
       t.integer :trx_id, null: false
@@ -272,6 +274,20 @@ class CreateInitialSchema < ActiveRecord::Migration[5.2]
       t.string :quantity, null: false
       t.timestamps null: false
     end
+    
+    create_table :transaction_accounts do |t|
+      t.string :account, null: false
+      t.integer :trx_id, null: false
+    end
+    
+    add_index :transaction_accounts, %i(account trx_id), unique: true, name: 'transaction_accounts-by-symbol-trx_id'
+    
+    create_table :transaction_symbols do |t|
+      t.string :symbol, null: false
+      t.integer :trx_id, null: false
+    end
+    
+    add_index :transaction_symbols, %i(symbol trx_id), unique: true, name: 'transaction_symbols-by-symbol-trx_id'
     
     create_table :checkpoints do |t|
       t.integer :block_num, null: false

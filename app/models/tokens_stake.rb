@@ -1,5 +1,5 @@
 # See: https://github.com/harpagon210/steemsmartcontracts/wiki/Tokens-Contract#stake
-class TokensStake < ApplicationRecord
+class TokensStake < ContractAction
   belongs_to :trx, class_name: 'Transaction', foreign_key: 'trx_id'
   
   validates_presence_of :trx

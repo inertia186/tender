@@ -57,7 +57,7 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
     t.string "action_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["trx_id", nil], name: "market_cancels-by-trx_id-symbol"
+    t.index ["trx_id", "action_type", "action_id"], name: "market_cancels-by-trx_id-action_type-action_id"
   end
 
   create_table "market_sells", force: :cascade do |t|
@@ -162,6 +162,7 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
     t.integer "number_transactions", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["trx_id", "symbol"], name: "tokens_enable_stakings-by-trx_id-symbol"
   end
 
   create_table "tokens_issues", force: :cascade do |t|
@@ -270,6 +271,18 @@ ActiveRecord::Schema.define(version: 2019_04_05_155538) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["trx_id", "symbol"], name: "tokens_update_urls-by-trx_id-symbol"
+  end
+
+  create_table "transaction_accounts", force: :cascade do |t|
+    t.string "account", null: false
+    t.integer "trx_id", null: false
+    t.index ["account", "trx_id"], name: "transaction_accounts-by-symbol-trx_id", unique: true
+  end
+
+  create_table "transaction_symbols", force: :cascade do |t|
+    t.string "symbol", null: false
+    t.integer "trx_id", null: false
+    t.index ["symbol", "trx_id"], name: "transaction_symbols-by-symbol-trx_id", unique: true
   end
 
   create_table "transactions", force: :cascade do |t|

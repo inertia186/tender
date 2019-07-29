@@ -41,6 +41,9 @@ class Transaction < ApplicationRecord
     trx.has_many :tokens_update_urls
   end
   
+  has_many :transaction_accounts, foreign_key: 'trx_id', dependent: :destroy
+  has_many :transaction_symbols, foreign_key: 'trx_id', dependent: :destroy
+  
   validates_presence_of :block_num
   validates_presence_of :ref_steem_block_num
   validates_presence_of :trx_id
@@ -79,49 +82,11 @@ class Transaction < ApplicationRecord
   }
   
   scope :with_account, lambda { |account = nil|
-    accounts = [account].flatten.map(&:downcase)
-    where_clause = (['id IN(?)'] * 11).join(' OR ')
-    
-    where(where_clause,
-      Transaction.where(sender: accounts).select(:id),
-      Transaction.where('logs LIKE ?', "%\"#{accounts[0]}\"%").select(:id), # FIXME this matches on non-accounts
-      TokensDelegate.where(to: accounts).select(:trx_id),
-      TokensIssue.where(to: accounts).select(:trx_id),
-      TokensTransfer.where(to: accounts).select(:trx_id),
-      TokensTransferOwnership.where(to: accounts).select(:trx_id),
-      TokensTransferToContract.where(to: accounts).select(:trx_id),
-      TokensUndelegate.where(from: accounts).select(:trx_id),
-      SscstoreBuy.where(recipient: accounts).select(:trx_id),
-      SteempeggedBuy.where(recipient: accounts).select(:trx_id),
-      SteempeggedRemoveWithdrawal.where(recipient: accounts).select(:trx_id),
-    )
+    where(id: TransactionAccount.where(account: account).select(:trx_id))
   }
   
   scope :with_symbol, lambda { |symbol = nil|
-    symbols = [symbol].flatten.compact.map(&:upcase)
-    where_clause = (['id IN(?)'] * 17).join(' OR ')
-    
-    where(where_clause,
-      Transaction.where(contract: 'market', action: 'buy').
-        where('logs LIKE ?', "%\"#{symbols[0]}\"%").except(:order).select(:id), # FIXME this matches on non-symbols
-      Transaction.where(contract: 'market', action: 'sell').
-        where('logs LIKE ?', "%\"#{symbols[0]}\"%").except(:order).select(:id), # FIXME this matches on non-symbols
-      TokensDelegate.where(symbol: symbols).except(:order).select(:trx_id),
-      TokensEnableDelegation.where(symbol: symbols).except(:order).select(:trx_id),
-      TokensIssue.where(symbol: symbols).except(:order).select(:trx_id),
-      TokensStake.where(symbol: symbols).except(:order).select(:trx_id),
-      TokensTransfer.where(symbol: symbols).select(:trx_id),
-      TokensUndelegate.where(symbol: symbols).select(:trx_id),
-      TokensCreate.where(symbol: symbols).select(:trx_id),
-      TokensTransferOwnership.where(symbol: symbols).select(:trx_id),
-      TokensTransferToContract.where(symbol: symbols).select(:trx_id),
-      TokensUnstake.where(symbol: symbols).except(:order).select(:trx_id),
-      TokensUpdateMetadata.where(symbol: symbols).select(:trx_id),
-      TokensUpdatePrecision.where(symbol: symbols).select(:trx_id),
-      TokensUpdateUrl.where(symbol: symbols).select(:trx_id),
-      MarketBuy.where(symbol: symbols).select(:trx_id),
-      MarketSell.where(symbol: symbols).select(:trx_id),
-    )
+    where(id: TransactionSymbol.where(symbol: symbol).select(:trx_id))
   }
   
   scope :search, lambda { |options = {}|
@@ -224,6 +189,20 @@ class Transaction < ApplicationRecord
   
   def hydrated_logs
     @hydrated_logs ||= JSON[logs] rescue {}
+  end
+  
+  def add_account(account)
+    return if account.nil?
+    return if transaction_accounts.where(account: account).any?
+    
+    transaction_accounts.create(account: account)
+  end
+  
+  def add_symbol(symbol)
+    return if symbol.nil?
+    return if transaction_symbols.where(symbol: symbol).any?
+    
+    transaction_symbols.create(symbol: symbol)
   end
 private
   def executed_code_hash_exceptions

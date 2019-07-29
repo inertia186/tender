@@ -1,5 +1,5 @@
 # See: https://github.com/harpagon210/steemsmartcontracts/wiki/Tokens-Contract#transfertocontract
-class TokensTransferToContract < ApplicationRecord
+class TokensTransferToContract < ContractAction
   belongs_to :trx, class_name: 'Transaction', foreign_key: 'trx_id'
   
   validates_presence_of :trx
