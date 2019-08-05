@@ -60,14 +60,19 @@ namespace :tender do
       
       Transaction.meeseeker_ingest(max_transactions) do |trx, key|
       puts "INGESTED: #{key}"
-      
-      processed += 1
+        keys << key if !!drop_redis_keys
     end
       
+      processed = keys.size
     elapsed = Time.now - start
     processed_per_second = elapsed == 0.0 ? 0.0 : processed / elapsed
     puts 'Finished in: %.3f seconds; Total Transactions: %d (processed %.3f transactions per second)' % [elapsed, Transaction.count, processed_per_second]
       puts 'Committing ...'
+    end
+    
+    if keys.any?
+      ctx = Redis.new(url: ENV.fetch('MEESEEKER_REDIS_URL', 'redis://127.0.0.1:6379/0'))
+      puts "Dropped redis keys: #{ctx.del(keys)}"
     end
     
     puts 'Done!'
