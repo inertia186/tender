@@ -121,9 +121,10 @@ class Transaction < ApplicationRecord
     end
   }
   
-  def self.meeseeker_ingest(&block)
+  def self.meeseeker_ingest(max_transactions = -1, &block)
     pattern = 'steem_engine:*:*:*:*'
     ctx = Redis.new(url: ENV.fetch('MEESEEKER_REDIS_URL', 'redis://127.0.0.1:6379/0'))
+    processed = 0
     
     ctx.scan_each(match: pattern) do |key|
       n, b, t, i = key.split(':')
@@ -168,6 +169,10 @@ class Transaction < ApplicationRecord
       else
         Rails.logger.warn("Did not persist: #{key}")
       end
+      
+      processed = processed + 1
+      
+      break if max_transactions > 0 && processed > max_transactions
     end
   end
   

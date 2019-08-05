@@ -27,17 +27,49 @@ namespace :tender do
   end
   
   desc 'Ingest Steem Engine transactions from Meeseeker.'
-  task trx_ingest: :environment do
+  task :trx_ingest, [:max_transactions, :turbo] => :environment do |t, args|
     start = Time.now
     processed = 0
-    Transaction.meeseeker_ingest do |trx, key|
+    max_transactions = (args[:max_transactions] || '-1').to_i
+    turbo = (args[:turbo] || 'false') == 'true'
+    connection = ActiveRecord::Base.connection
+    
+    if !!turbo
+      abort 'Setting turbo requires setting valid max_transactions.' if max_transactions == -1
+      
+      case connection.instance_values["config"][:adapter]
+      when 'sqlite3'
+        connection.execute 'PRAGMA synchronous = OFF'
+      else
+        puts 'Turbo not suppored by current adapter.'
+      end
+    end
+    
+    ActiveRecord::Base.transaction do
+      if !!turbo
+        case connection.instance_values["config"][:adapter]
+        when 'sqlite3'
+          puts 'Turbo enabled.'
+          
+          connection.execute 'PRAGMA cache_size = 10000'
+          connection.execute 'PRAGMA journal_mode = MEMORY'
+          connection.execute 'PRAGMA temp_store = MEMORY'
+        end
+      end
+      
+      Transaction.meeseeker_ingest(max_transactions) do |trx, key|
       puts "INGESTED: #{key}"
       
       processed += 1
     end
+      
     elapsed = Time.now - start
     processed_per_second = elapsed == 0.0 ? 0.0 : processed / elapsed
     puts 'Finished in: %.3f seconds; Total Transactions: %d (processed %.3f transactions per second)' % [elapsed, Transaction.count, processed_per_second]
+      puts 'Committing ...'
+    end
+    
+    puts 'Done!'
   end
   
   namespace :trx_ingest do
