@@ -56,7 +56,7 @@ private
   end
   
   def replaying?
-    (public_head_block_num - Transaction.distinct(:block_num).count(:block_num) - 1).abs > 48 ||
+    (public_head_block_num - Transaction.order(id: :desc).limit(1000).pluck(:block_num).min).abs > 48 ||
     (public_head_block_num - head_block_num).abs > 48
   end
   
