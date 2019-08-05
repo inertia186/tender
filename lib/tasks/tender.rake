@@ -27,12 +27,13 @@ namespace :tender do
   end
   
   desc 'Ingest Steem Engine transactions from Meeseeker.'
-  task :trx_ingest, [:max_transactions, :turbo] => :environment do |t, args|
+  task :trx_ingest, [:drop_redis_keys, :max_transactions, :turbo] => :environment do |t, args|
     start = Time.now
-    processed = 0
+    drop_redis_keys = (args[:drop_redis_keys] || 'true') == 'true'
     max_transactions = (args[:max_transactions] || '-1').to_i
     turbo = (args[:turbo] || 'false') == 'true'
     connection = ActiveRecord::Base.connection
+    keys = []
     
     if !!turbo
       abort 'Setting turbo requires setting valid max_transactions.' if max_transactions == -1

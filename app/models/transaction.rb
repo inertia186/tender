@@ -127,6 +127,8 @@ class Transaction < ApplicationRecord
     processed = 0
     
     ctx.scan_each(match: pattern) do |key|
+      break if max_transactions > -1 && processed >= max_transactions
+      
       n, b, t, i = key.split(':')
       params = JSON[ctx.get(key)]
       trx_id = params['transactionId'].to_s.split('-')[0]
@@ -164,15 +166,11 @@ class Transaction < ApplicationRecord
       
       yield transaction, key if !!block
       
-      if transaction.persisted?
-        ctx.del(key)
-      else
+      unless transaction.persisted?
         Rails.logger.warn("Did not persist: #{key}")
       end
       
       processed = processed + 1
-      
-      break if max_transactions > 0 && processed > max_transactions
     end
   end
   
