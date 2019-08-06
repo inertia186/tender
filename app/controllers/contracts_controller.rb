@@ -4,7 +4,7 @@ class ContractsController < ApplicationController
   def index
     @per_page = (contracts_params[:per_page] || '100').to_i
     @page = (contracts_params[:page] || '1').to_i
-    @contracts = Transaction.order(timestamp: :desc, trx_in_block: :asc)
+    @contracts = Transaction.order(block_num: :desc, trx_in_block: :asc)
     @contracts = @contracts.where(contract: 'contract')
     @contracts = @contracts.where(action: %w(deploy update))
     @contracts = @contracts.paginate(per_page: @per_page, page: @page)
