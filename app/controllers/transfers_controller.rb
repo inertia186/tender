@@ -9,7 +9,7 @@ class TransfersController < ApplicationController
     @page = (transfers_params[:page] || '1').to_i
     @transfers = TokensTransfer.joins(:trx).includes(:trx).where(to: @to)
     @transfers = @transfers.where(symbol: @symbol) if @symbol.present? && @symbol != '*'
-    @transfers = @transfers.order(Transaction.arel_table[:timestamp].desc)
+    @transfers = @transfers.order(Transaction.arel_table[:block_num].desc)
     @transfers = @transfers.paginate(per_page: @per_page, page: @page)
     @elapsed = Time.now - @start
   end

@@ -12,5 +12,5 @@
   %td= token.trx.timestamp
   %td
     = link_to transactions_path(symbol: token.symbol) do
-      %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = Transaction.with_symbol(token.symbol).maximum(:timestamp)}
+      %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = Transaction.with_symbol(token.symbol).order(block_num: :desc).first.timestamp}
         = active_at

@@ -2,7 +2,7 @@
   %li.nav-item= link_to 'All Tokens', tokens_path, class: 'nav-link' + (params[:only_stake_enabled].nil? && params[:only_scot].nil? ? ' active' : '')
   %li.nav-item= link_to 'Stake Enabled', tokens_path(only_stake_enabled: true), class: 'nav-link' + (params[:only_stake_enabled] == 'true' ? ' active' : '')
   %li.nav-item= link_to 'SCOT', tokens_path(only_scot: true), class: 'nav-link' + (params[:only_scot] == 'true' ? ' active' : '')
-- cache [Transaction.with_symbol(@tokens.pluck(:symbol)).maximum(:timestamp), params.to_unsafe_h] do
+- cache [Transaction.with_symbol(@tokens.pluck(:symbol)).maximum(:block_num), params.to_unsafe_h] do
   .row
     .col-sm-12  
       %table.table.table-striped.table-borderless
