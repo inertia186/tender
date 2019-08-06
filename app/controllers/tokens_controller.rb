@@ -8,7 +8,7 @@ class TokensController < ApplicationController
     @per_page = (tokens_params[:per_page] || '10').to_i
     @page = (tokens_params[:page] || '1').to_i
     @tokens = TokensCreate.joins(:trx).includes(:trx)
-    @tokens = @tokens.order(Transaction.arel_table[:timestamp].asc)
+    @tokens = @tokens.order(Transaction.arel_table[:block_num].asc)
     @tokens = @tokens.where.not(symbol: DISABLED_TOKENS)
     @tokens = @tokens.paginate(per_page: @per_page, page: @page)
     
