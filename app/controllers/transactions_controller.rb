@@ -8,7 +8,7 @@ class TransactionsController < ApplicationController
     @contract = transactions_params[:contract]
     @contract_action = transactions_params[:contract_action]
     @open_orders = transactions_params[:open_orders]
-    @transactions = Transaction.order(timestamp: :desc, trx_in_block: :asc)
+    @transactions = Transaction.order(block_num: :desc, trx_in_block: :asc)
     
     if !!transactions_params[:account]
       @transactions = @transactions.with_account(transactions_params[:account])
