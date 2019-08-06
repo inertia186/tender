@@ -1,7 +1,7 @@
 %h1 Contracts
 
 - cache [contracts_params, head_block_num] do
-  - if @contracts.any?
+  - if @contracts.exists?
     = render partial: 'contract', collection: @contracts, cached: true
   - else
     .jumbotron.text-center

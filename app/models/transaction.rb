@@ -135,7 +135,7 @@ class Transaction < ApplicationRecord
       b = b.to_i
       i = i.to_i
       
-      if Transaction.where(block_num: b, trx_id: trx_id, trx_in_block: i).any?
+      if Transaction.where(block_num: b, trx_id: trx_id, trx_in_block: i).exists?
         Rails.logger.warn("Already ingested: #{key} (skipped)")
         ctx.del(key)
         next
@@ -196,14 +196,14 @@ class Transaction < ApplicationRecord
   
   def add_account(account)
     return if account.nil?
-    return if transaction_accounts.where(account: account).any?
+    return if transaction_accounts.where(account: account).exists?
     
     transaction_accounts.create(account: account)
   end
   
   def add_symbol(symbol)
     return if symbol.nil?
-    return if transaction_symbols.where(symbol: symbol).any?
+    return if transaction_symbols.where(symbol: symbol).exists?
     
     transaction_symbols.create(symbol: symbol)
   end

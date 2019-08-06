@@ -14,7 +14,7 @@
   %h1= transactions_params[:symbol]
 
 - cache [transactions_params, head_block_num] do
-  - if @transactions.any?
+  - if @transactions.exists?
     = render partial: 'transaction', collection: @transactions, cached: true
   - else
     .jumbotron.text-center

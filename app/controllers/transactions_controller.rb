@@ -38,7 +38,7 @@ class TransactionsController < ApplicationController
         elsif (trx_id = keyword.split('-')[0]).size == 40
           redirect_to tx_url(trx_id)
           return
-        elsif keyword.scan(/\D/).empty? && Transaction.where(block_num: keyword).any?
+        elsif keyword.scan(/\D/).empty? && Transaction.where(block_num: keyword).exists?
           redirect_to b_url(keyword)
           return
         end
