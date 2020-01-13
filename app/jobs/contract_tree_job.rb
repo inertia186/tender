@@ -12,6 +12,7 @@ class ContractTreeJob < ActiveJob::Base
   end
 private
   def render
+    @@render_at ||= Time.now
     @@cached_partial = ''
     
     Thread.new do
@@ -20,7 +21,6 @@ private
         template = File.read("#{Rails.root}/app/views/dashboard/_contract_tree.html.haml")
         renderer = Haml::Engine.new(template)
         @@cached_partial = renderer.render(binding, locals: {latest_transactions: latest_transactions, contract: contract})
-        @@render_at = Time.now
       end
     end
     
