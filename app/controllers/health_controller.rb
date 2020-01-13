@@ -4,13 +4,9 @@ class HealthController < ApplicationController
     steem_block_num = redis_ctx.get('steem:meeseeker:last_block_num').to_i
     steem_engine_block_num = redis_ctx.get('steem_engine:meeseeker:last_block_num').to_i
     steem_time = nil
-    @steem_head_block_num = nil
+    @steem_head_block_num = steem_head_block_num
+    @datetime = steem_datetime
     @steem_engine_head_block_num = nil
-    
-    condenser_api.get_dynamic_global_properties do |dgpo|
-      @datetime = steem_time = Time.parse(dgpo.time + 'Z')
-      @steem_head_block_num = dgpo.head_block_number
-    end
     
     @steem_engine_head_block_num = head_block_num
     

@@ -6,6 +6,7 @@ class RichlistController < ApplicationController
   def index
     @start = Time.now
     @per_page = (params[:per_page] || '100').to_i
+    @limit = params[:limit]
     @page = (params[:page] || '1').to_i
     @sort_field = (params[:sort_field] || 'total_balance').to_sym
     @sort_order = (params[:sort_order] || 'desc').to_sym
@@ -24,7 +25,7 @@ class RichlistController < ApplicationController
         query: {
           symbol: @symbol
         },
-        limit: 1000,
+        limit: @limit || 1000,
         offset: @richlist.size
       })
       sub_list ||= []
@@ -34,8 +35,8 @@ class RichlistController < ApplicationController
     end
     
     @richlist_count = @richlist.size
-    @total_staked = @richlist.map{|b| b['stake'].to_f}.sum
-    @total_staked_accounts = @richlist.select{|b| b['stake'].to_f > 0.0}.size
+    @total_staked = @richlist.map{|b| b['stake'].to_f || b['delegationsOut'].to_f}.sum
+    @total_staked_accounts = @richlist.select{|b| (b['stake'].to_f > 0.0) || (b['delegationsOut'].to_f > 0.0)}.size
     
     @stake_enabled = @total_staked_accounts > 0
     
@@ -64,6 +65,10 @@ class RichlistController < ApplicationController
       @richlist.sort_by do |balance|
         balance['delegationsIn'].to_f
       end
+    when :influence
+      @richlist.sort_by do |balance|
+        balance['stake'].to_f + balance['delegationsIn'].to_f
+      end
     else
       @richlist.sort_by do |balance|
         balance['balance'].to_f + balance['stake'].to_f + balance['pendingUnstake'].to_f
@@ -74,6 +79,8 @@ class RichlistController < ApplicationController
     when :desc then @richlist.reverse
     else; @richlist
     end
+    
+    @richlist = @richlist.first(@limit) if !!@limit
     
     @elapsed = Time.now - @start
     
@@ -87,7 +94,14 @@ class RichlistController < ApplicationController
           csv << %w(account balance stake pendingUnstake delegationsOut delegationsIn)
           
           @richlist.each do |b|
-            row = [b['account'], b['balance'].to_f, b['stake'].to_f, b['pendingUnstake']]
+            row = [
+              b['account'],
+              (b['balance'].to_f rescue 0.0),
+              (b['stake'].to_f rescue 0.0),
+              (b['pendingUnstake'].to_f rescue 0.0),
+              (b['delegationsOut'].to_f rescue 0.0),
+              (b['delegationsIn'].to_f rescue 0.0)
+            ]
             csv << row
           end
         end

@@ -61,7 +61,7 @@ class TransactionsController < ApplicationController
         },
         limit: 1000,
         offset: 0,
-        indexes: [{"index":"timestamp","descending":true}]
+        indexes: [{"index":"_id","descending":true}]
       }
       
       if !!transactions_params[:account]
@@ -84,14 +84,20 @@ class TransactionsController < ApplicationController
         end
       end
       
-      while (t = steem_engine_contracts.find(order_params.merge(table: 'sellBook'))).any?
+      if (t = steem_engine_contracts.find(order_params.merge(limit: 0, table: 'sellBook'))).nil?
+        # FIXME Here, we are guessing which API version (`mongodb` has different indices).
+        
+        order_params[:indexes] = [{"index":"_id","descending":true}]
+      end
+      
+      while (t = steem_engine_contracts.find(order_params.merge(limit: 1000, table: 'buyBook'))).any?
         open_sells += t
         order_params[:offset] += open_sells.size
       end
       
       order_params[:offset] = 0
       
-      while (t = steem_engine_contracts.find(order_params.merge(table: 'buyBook'))).any?
+      while (t = steem_engine_contracts.find(order_params.merge(limit: 1000, table: 'buyBook'))).any?
         open_buys += t
         order_params[:offset] += open_buys.size
       end

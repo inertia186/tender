@@ -11,6 +11,14 @@ private
       url: ENV.fetch('STEEM_NODE_URL', 'https://api.steemit.com'),
       persist: false
     }
+    
+    if @steem_options[:failover_urls].nil? !!ENV['STEEM_NODE_FAILOVER_URLS']
+      failover_urls = ENV['STEEM_NODE_FAILOVER_URLS'].split(',')
+      
+      @steem_options = @steem_options.merge(failover_urls: failover_urls)
+    end
+    
+    @steem_options
   end
     
   def steem_engine_options
@@ -20,12 +28,19 @@ private
     }
   end
   
+  def public_steem_engine_options
+    @steem_engine_options ||= {
+      root_url: ENV.fetch('PUBLIC_STEEM_ENGINE_NODE_URL', 'https://api.steem-engine.com/rpc'),
+      persist: false
+    }
+  end
+  
   def condenser_api
     @condenser_api ||= Radiator::CondenserApi.new(steem_options)
   end
   
   def public_steem_engine_blockchain
-    @public_steem_engine_blockchain ||= Radiator::SSC::Blockchain.new(steem_engine_options.merge(root_url: 'https://api.steem-engine.com/rpc'))
+    @public_steem_engine_blockchain ||= Radiator::SSC::Blockchain.new(public_steem_engine_options)
   end
   
   def steem_engine_blockchain
@@ -47,6 +62,19 @@ private
     )
   end
   
+  def steem_head_block_num
+    condenser_api.get_dynamic_global_properties do |dgpo|
+      @datetime = steem_time = Time.parse(dgpo.time + 'Z')
+      steem_head_block_num = dgpo.head_block_number
+    end
+  end
+  
+  def steem_datetime
+    condenser_api.get_dynamic_global_properties do |dgpo|
+      steem_time = Time.parse(dgpo.time + 'Z')
+    end
+  end
+  
   def public_head_block_num
     public_steem_engine_blockchain.latest_block_info['blockNumber'] rescue nil || -1
   end
@@ -56,8 +84,10 @@ private
   end
   
   def replaying?
-    (public_head_block_num - Transaction.order(id: :desc).limit(1000).pluck(:block_num).min).abs > 48 ||
-    (public_head_block_num - head_block_num).abs > 48
+    block_num = public_head_block_num
+    
+    (block_num - Transaction.order(id: :desc).limit(1000).pluck(:block_num).min).abs > 48 ||
+    (block_num - head_block_num).abs > 48
   end
   
   def close_agents
