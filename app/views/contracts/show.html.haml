@@ -1,3 +1,6 @@
+%script(src='https://cdn.rawgit.com/beautify-web/js-beautify/v1.10.2/js/lib/beautify.js')
+%script(src='https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js')
+
 .row
   .col-sm-4
     %h1
@@ -13,3 +16,12 @@
       %pre.card-body
         %code
           = Base64.decode64(@contract.code)
+
+:javascript
+  $(document).on('ready turbolinks:load', function() {
+    code = $('pre > code');
+    beautified = js_beautify(code.text());
+    code.empty().append(beautified);
+    code.addClass('prettyprint');
+    code.addClass('language-javasript');
+  });
