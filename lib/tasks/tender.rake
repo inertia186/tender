@@ -78,6 +78,32 @@ namespace :tender do
     puts 'Done!'
   end
   
+  desc 'Ingest Steem Engine orphaned transactions.'
+  task :orphan_trx_ingest, [:max_transactions, :include_virtual_trx] => :environment do |t, args|
+    max_transactions = args[:max_transactions]
+    include_virtual_trx = (args[:include_virtual_trx] || 'true') == 'true'
+    orphaned_transactions = Transaction.with_logs_errors(false).
+      where.not(id: TransactionAccount.select(:trx_id))
+    
+    if !!max_transactions
+      orphaned_transactions = orphaned_transactions.limit(max_transactions.to_i)
+    end
+    
+    unless !!include_virtual_trx
+      orphaned_transactions = orphaned_transactions.where.not(trx_id: Transaction::VIRTUAL_TRX_ID)
+    end
+    
+    abort("No orphaned transactions.") if orphaned_transactions.none?
+    
+    orphaned_transactions.find_each do |trx|
+      begin
+        trx.send(:parse_contract)
+      rescue => e
+        puts "Skipped #{trx.trx_id} ... (#{e.inspect})"
+      end
+    end
+  end
+  
   namespace :trx_ingest do
     desc 'Log filtered for trx_ingest messages.'
     task :log do
