@@ -19,5 +19,3 @@
         .card-body.bg-white
           %h3.card-title.lead Contracts:
           %samp.card-text.float-right= link_to number_with_delimiter((ContractDeploy.pluck(:name) + ContractUpdate.pluck(:name)).uniq.size), contracts_path
-      
-      = ContractTreeJob.perform
