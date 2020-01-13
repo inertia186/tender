@@ -21,7 +21,7 @@
           %samp.card-text.float-right= link_to number_with_delimiter((ContractDeploy.pluck(:name) + ContractUpdate.pluck(:name)).uniq.size), contracts_path
       
       - Rails.cache.fetch('contract_tree', expires_in: 1.hour) do
-        - Transaction.distinct.where('created_at > ?', 24.hours.ago).order(:contract).pluck(:contract).each do |contract|
+        - Transaction.distinct.where('timestamp > ?', 24.hours.ago).order(:contract).pluck(:contract).each do |contract|
           - next if %w(null token).include? contract
           .card.mb-3.shadow-sm
             %h5.card-header.bg-light 
