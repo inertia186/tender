@@ -238,6 +238,9 @@ private
       params['action_type'] = params.delete('type') if !!params['type']
       params['action_id'] = params.delete('id') if !!params['id']
       params['tx_id'] = params.delete('txID') if !!params['txID']
+      params['amount_steemsbd'] = params.delete('amountSTEEMSBD') if !!params['amountSTEEMSBD']
+      params['memo'] = params['memo'].to_s if params.keys.include? "memo"
+      params['p2p_port'] = params.delete('P2PPort') if !!params['P2PPort']
       params.deep_transform_keys!(&:underscore)
       params.select!{ |k, _v| klass.attribute_names.index(k) }
       
@@ -251,7 +254,7 @@ private
       begin
         klass.create!(params.merge(trx: self))
       rescue => e
-        raise "Unable to create record (trx_id: #{trx_id}): #{contract}.#{action} (params: #{params}) (caused by: #{e})"
+        Rails.logger.error("Unable to create record (trx_id: #{trx_id}): #{contract}.#{action} (params: #{params}) (caused by: #{e})")
       end
     end
   end
