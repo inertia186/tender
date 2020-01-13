@@ -12,7 +12,7 @@ private
       persist: false
     }
     
-    if @steem_options[:failover_urls].nil? !!ENV['STEEM_NODE_FAILOVER_URLS']
+    if @steem_options[:failover_urls].nil? && !!ENV['STEEM_NODE_FAILOVER_URLS']
       failover_urls = ENV['STEEM_NODE_FAILOVER_URLS'].split(',')
       
       @steem_options = @steem_options.merge(failover_urls: failover_urls)
