@@ -58,7 +58,7 @@
             - if transaction.action == 'cancel'
               = surround '(', ')' do
                 = link_to "original transaction #{payload['type']}", tx_path(payload['id'])
-            - else
+            - elsif !!payload['quantity']
               %code= number_with_delimiter(payload['quantity']) + ' ' + payload['symbol']
               %span.text-muted @
               %code= number_with_delimiter(payload['price']) + ' STEEMP'

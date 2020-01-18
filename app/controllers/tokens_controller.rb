@@ -2,7 +2,7 @@ class TokensController < ApplicationController
   helper_method :tokens_params
   
   # See: https://github.com/MattyIce/steem-engine/blob/master/scripts/Config-Prod.js#L11
-  DISABLED_TOKENS = %w(BTC LTC STEEM SBD BCC XAP XRP GOLOS DISNEY AMAZON VOICE ETH EOS)
+  DISABLED_TOKENS = %w(BTC LTC STEEM SBD BCC XAP XRP GOLOS DISNEY AMAZON VOICE ETH EOS TIME)
 
   def index
     @per_page = (tokens_params[:per_page] || '10').to_i
