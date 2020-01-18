@@ -2,7 +2,7 @@
   .text-center= image_tag 'loading.gif'
 
 :javascript
-  $(document).on('turbolinks:load', function() {
+  $(document).on('ready turbolinks:load', function() {
     $.getJSON( document.location.href, function( data ) {
       formatter = new JSONFormatter(data.issues);
       formatter.openAtDepth(2);

@@ -18,10 +18,20 @@
           = Base64.decode64(@contract.code)
 
 :javascript
-  $(document).on('ready turbolinks:load', function() {
-    code = $('pre > code');
-    beautified = js_beautify(code.text());
-    code.empty().append(beautified);
-    code.addClass('prettyprint');
-    code.addClass('language-javasript');
-  });
+  var beautify = function() {
+    try {
+      code = $('pre > code');
+      beautified = js_beautify(code.text());
+      code.empty().append(beautified);
+      code.addClass('prettyprint');
+      code.addClass('language-javasript');
+    } catch (e) {
+      if ( e instanceof ReferenceError ) {
+        console.log('CDN did not load in time, retrying.');
+        
+        setTimeout(beautify, 3000);
+      }
+    }
+  }
+  
+  $(document).on('ready turbolinks:load', beautify);
