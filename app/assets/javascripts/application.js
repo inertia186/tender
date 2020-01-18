@@ -24,7 +24,7 @@
 // $(document).on('turbolinks:load', function() {
 // });
 
-$(document).on('turbolinks:load', function() {
+$(document).on('ready turbolinks:load', function() {
   
   $('[data-toggle="tooltip"]').tooltip();
   
@@ -32,8 +32,9 @@ $(document).on('turbolinks:load', function() {
     var time = $(this);
     
     if ( time.text().indexOf(time.attr('title')) == -1 ) { return; }
-    
-    time.text(moment.utc(time.text(), 'YYYY-MM-DD HH:mm:ss Z').fromNow());
+    if ( time.text().indexOf(' UTC') != -1 ) {
+      time.text(moment.utc(time.text(), 'YYYY-MM-DD HH:mm:ss Z').fromNow());
+    }
   });
 
   $('pre code').each(function() {
