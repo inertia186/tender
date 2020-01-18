@@ -1,0 +1,17 @@
+%tr
+  %td= nft.name.truncate(30)
+  - url = JSON[TokensUpdateMetadata.find_by(symbol: nft.symbol).try(:metadata) || '{}'].fetch('url', nft.url)
+  - if !!url
+    - url = "https://#{url.sub(/^http(s?):\/\//i, '').strip}"
+    %td.symbol= link_to nft.symbol, URI.parse(url).to_s rescue nft.symbol
+  - else
+    %td.symbol= nft.symbol
+  %td= link_to nft.trx.sender, account_home_path(nft.trx.sender)
+  %td= number_with_delimiter nft.max_supply
+  %td= nft.hydrated_authorized_issuing_accounts.join(', ')
+  %td= nft.trx.timestamp
+  %td
+    = link_to transactions_path(symbol: nft.symbol) do
+      - trx_id = TransactionSymbol.where(symbol: nft.symbol).maximum(:trx_id)
+      %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = Transaction.find(trx_id).timestamp}
+        = active_at

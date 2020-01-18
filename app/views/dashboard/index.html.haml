@@ -17,5 +17,8 @@
           %h3.card-title.lead Tokens:
           %samp.card-text.float-right= link_to number_with_delimiter(TokensCreate.distinct(:symbol).count), tokens_path
         .card-body.bg-white
+          %h3.card-title.lead NFTs:
+          %samp.card-text.float-right= link_to number_with_delimiter(NftCreate.distinct(:symbol).count), nfts_path
+        .card-body.bg-white
           %h3.card-title.lead Contracts:
           %samp.card-text.float-right= link_to number_with_delimiter((ContractDeploy.pluck(:name) + ContractUpdate.pluck(:name)).uniq.size), contracts_path

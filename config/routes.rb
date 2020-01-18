@@ -14,6 +14,8 @@ Rails.application.routes.draw do
     resources :richlist, only: %i(index)
   end
   
+  resources :nfts, only: %i(index show)
+  
   resources :blocks, only: %i(show)
   get '/b/:block_num', to: 'blocks#show', as: :b
   

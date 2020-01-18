@@ -39,6 +39,12 @@ class Transaction < ApplicationRecord
     trx.has_many :tokens_update_params, class_name: 'TokensUpdateParams'
     trx.has_many :tokens_update_precisions
     trx.has_many :tokens_update_urls
+    trx.has_many :nft_add_properties
+    trx.has_many :nft_creates
+    trx.has_many :nft_issues
+    trx.has_many :nft_update_metadata, class_name: 'nftUpdateMetadata'
+    trx.has_many :nft_update_names
+    trx.has_many :nftmarket_enable_markets
   end
   
   has_many :transaction_accounts, foreign_key: 'trx_id', dependent: :destroy
@@ -235,7 +241,8 @@ private
     if !!klass
       params = hydrated_payload
       params.delete('isSignedWithActiveKey')
-      params['action_type'] = params.delete('type') if !!params['type']
+      params['action_type'] = params.delete('type') if contract == 'market' && action == 'cancel' && !!params['type']
+      params['property_type'] = params.delete('type') if contract == 'nft' && action == 'add_properties' && !!params['type']
       params['action_id'] = params.delete('id') if !!params['id']
       params['tx_id'] = params.delete('txID') if !!params['txID']
       params['amount_steemsbd'] = params.delete('amountSTEEMSBD') if !!params['amountSTEEMSBD']

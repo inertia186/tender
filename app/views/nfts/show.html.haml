@@ -1,0 +1,38 @@
+.row
+  .col-sm-12
+    %h1
+      - url = JSON[NftUpdateMetadata.find_by(symbol: @nft.symbol).try(:metadata) || '{}'].fetch('url', @nft.url)
+      - if !!url
+        - url = "https://#{url.sub(/^http(s?):\/\//i, '').strip}"
+        %span.symbol= link_to @nft.symbol, URI.parse(url).to_s rescue @nft.symbol
+      \-
+      = @nft.name
+
+    %table.table.table-striped
+      %tbody
+        %tr
+          %th Issuer
+          %td= link_to @nft.trx.sender, account_home_path(@nft.trx.sender)
+        %tr
+          %th Max Supply
+          %td= number_with_delimiter @nft.max_supply
+        %tr
+          %th Authorized Issuing Accounts
+          %td= @nft.hydrated_authorized_issuing_accounts.join(', ')
+        %tr
+          %th Created
+          %td= @nft.trx.timestamp
+        %tr
+          %th Activity
+          %td
+            = link_to transactions_path(symbol: @nft.symbol) do
+              %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = Transaction.with_symbol(@nft.symbol).order(block_num: :desc).first.timestamp}
+                = active_at
+
+    %table.table.table-striped
+      %tbody
+        - NftAddProperty.where(symbol: @nft.symbol).each do |property|
+          %tr
+            %th= propery.name
+            %td= propery.type
+            %td= propery.is_read_only

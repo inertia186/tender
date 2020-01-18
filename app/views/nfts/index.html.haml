@@ -1,0 +1,17 @@
+- cache [TransactionSymbol.where(symbol: @nfts.pluck(:symbol)).maximum(:id), params.to_unsafe_h] do
+  .row
+    .col-sm-12  
+      %table.table.table-striped.table-borderless
+        %thead
+          %tr
+            %th Name
+            %th Symbol
+            %th Issuer
+            %th Max Supply
+            %th Authorized Issuing Accounts
+            %th Created
+            %th Activity
+        %tbody
+          = render partial: 'nft_row', collection: @nfts, as: :nft
+      
+      = will_paginate(@nfts, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
