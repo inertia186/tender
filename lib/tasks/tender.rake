@@ -84,6 +84,7 @@ namespace :tender do
     include_virtual_trx = (args[:include_virtual_trx] || 'true') == 'true'
     orphaned_transactions = Transaction.with_logs_errors(false).
       where.not(id: TransactionAccount.select(:trx_id))
+    found_transactions = false
     
     if !!max_transactions
       orphaned_transactions = orphaned_transactions.limit(max_transactions.to_i)
@@ -93,15 +94,21 @@ namespace :tender do
       orphaned_transactions = orphaned_transactions.where.not(trx_id: Transaction::VIRTUAL_TRX_ID)
     end
     
-    abort("No orphaned transactions.") if orphaned_transactions.none?
-    
     orphaned_transactions.find_each do |trx|
       begin
-        trx.send(:parse_contract)
+        action = trx.send(:parse_contract)
+        
+        if action.kind_of?(ContractAction) && action.persisted?
+          found_transactions = true
+          
+          puts "INGESTED: steem_engine:#{action.trx.block_num}:#{action.trx.trx_id}:#{action.trx.trx_in_block}:#{action.trx.contract}:#{action.trx.action}"
+        end
       rescue => e
         puts "Skipped #{trx.trx_id} ... (#{e.inspect})"
       end
     end
+    
+    abort("No orphaned transactions.") unless found_transactions
   end
   
   namespace :trx_ingest do
