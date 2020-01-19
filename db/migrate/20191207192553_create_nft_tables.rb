@@ -10,7 +10,7 @@ class CreateNftTables < ActiveRecord::Migration[6.0]
       t.timestamps null: false
     end
     
-    add_index :nft_creates, %i(trx_id), name: 'nft_creates-by-trx_id'
+    add_index :nft_creates, %i(trx_id symbol), name: 'nft_creates-by-trx_id-symbol'
     
     create_table :nft_add_properties do |t|
       t.integer :trx_id, null: false
@@ -21,7 +21,7 @@ class CreateNftTables < ActiveRecord::Migration[6.0]
       t.timestamps null: false
     end
     
-    add_index :nft_add_properties, %i(trx_id symbol name type), name: 'nft_add_properties-by-trx_id-symbol-name-type'
+    add_index :nft_add_properties, %i(trx_id symbol name property_type), name: 'nft_add_properties-by-trx_id-symbol-name-property_type'
     
     create_table :nft_update_names do |t|
       t.integer :trx_id, null: false
