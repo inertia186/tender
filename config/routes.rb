@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   
   resources :contracts, only: %i(index show)
   get '/contracts/:a_trx_id/:b_trx_id', to: 'contracts#diff', as: :contract_diff
+  get '/contract/errors', to: 'contracts#index', as: :contract_errors, only_errors: true
 
   resources :checkpoints, only: %i(index)
   

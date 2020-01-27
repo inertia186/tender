@@ -69,6 +69,7 @@ class Transaction < ApplicationRecord
   validates_uniqueness_of :hash
   validates_uniqueness_of :database_hash, scope: %i(trx_id trx_in_block)
   
+  before_validation :parse_error, on: :create
   after_commit :parse_contract, on: :create
   
   scope :consensus_order, lambda { |consensus_order = :asc|
@@ -84,11 +85,7 @@ class Transaction < ApplicationRecord
   }
   
   scope :with_logs_errors, lambda { |with_logs_errors = true|
-    if !!with_logs_errors
-      where("logs LIKE '%\"errors\":%'")
-    else
-      where("logs NOT LIKE '%\"errors\":%'")
-    end
+    where(is_error: with_logs_errors)
   }
   
   scope :with_account, lambda { |account = nil|
@@ -128,6 +125,18 @@ class Transaction < ApplicationRecord
       where(trx_id: VIRTUAL_TRX_ID)
     else
       where.not(trx_id: VIRTUAL_TRX_ID)
+    end
+  }
+  
+  scope :contract_deploys_or_updates, lambda { |options = {with_logs_errors: false}|
+    contract_deploys = ContractDeploy.select(:trx_id)
+    contract_updates = ContractUpdate.select(:trx_id)
+    r = where(contract: 'contract').where("action IN ('deploy', 'update')")
+    
+    if !!options[:with_logs_errors]
+      r = r.where("transactions.id IN(?) OR transactions.id IN(?) OR (transactions.id NOT IN(?) AND transactions.id NOT IN(?) AND is_error = true)", contract_deploys, contract_updates, contract_deploys, contract_updates)
+    else
+      r = r.where("transactions.id IN(?) OR transactions.id IN(?)", contract_deploys, contract_updates)
     end
   }
   
@@ -219,15 +228,19 @@ class Transaction < ApplicationRecord
   end
 private
   def executed_code_hash_exceptions
-    (hydrated_logs['errors'] || [] & EXECUTED_CODE_HASH_EXCEPTIONS).any?
+    is_error? && (hydrated_logs['errors'] || [] & EXECUTED_CODE_HASH_EXCEPTIONS).any?
   end
   
   def database_hash_exceptions
     block_num == GENESIS_BLOCK[:block_num]
   end
   
+  def parse_error
+    self.is_error = (hydrated_logs['errors'] || []).any?
+  end
+  
   def parse_contract
-    if (hydrated_logs['errors'] || []).any?
+    if is_error?
       Rails.logger.debug("Ignoring action (trx_id: #{trx_id}): #{contract}.#{action}; errors: #{hydrated_logs['errors'].to_json}")
       
       return

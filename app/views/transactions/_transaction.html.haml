@@ -67,7 +67,7 @@
           - if !!logs['events']
             .d-flex.align-content-around.flex-wrap
               = render partial: 'event', collection: logs['events'], locals: {memo: payload['memo']}
-        - if !!logs['errors']
+        - if transaction.is_error?
           = render partial: 'error', collection: logs['errors']
         = link_to transaction.trx_id[0..6], tx_path(transaction.trx_id), class: 'tag'
         .foot

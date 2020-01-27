@@ -29,7 +29,7 @@
           - if !!previous
             \|
             = link_to 'view diff', contract_diff_path(contract.trx_id, previous.trx.trx_id)
-        - if !!logs['errors']
+        - if contract.is_error?
           = render partial: 'error', collection: logs['errors']
         = link_to contract.trx_id[0..6], tx_path(contract.trx_id), class: 'tag'
         .foot
