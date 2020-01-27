@@ -71,6 +71,10 @@ class Transaction < ApplicationRecord
   
   after_commit :parse_contract, on: :create
   
+  scope :consensus_order, lambda { |consensus_order = :asc|
+    order(block_num: consensus_order, trx_in_block: consensus_order == :asc ? :desc : :asc, trx_id: consensus_order)
+  }
+  
   scope :contract, lambda { |contract, options = {}|
     if !!options[:invert]
       where.not(contract: contract)

@@ -1,11 +1,41 @@
 class ApplicationController < ActionController::Base
+  include Pagy::Backend
+  
   helper_method :condenser_api
   helper_method :public_steem_engine_blockchain, :steem_engine_blockchain
   helper_method :public_head_block_num, :head_block_num
   helper_method :replaying?
+  helper_method :contract_deploy_block_num
   
+  before_action :set_query_only
   after_action :close_agents
 private
+  def contract_deploy_block_num(contract_name)
+    @@contract_deploy_block_num ||= {}
+    
+    @@contract_deploy_block_num[contract_name] ||= ContractDeploy.where(name: contract_name).joins(:trx).minimum(:block_num) rescue -1
+  end
+  
+  # Nothing should ever be written from any action, so certain PRAGMA
+  # assumptions can be made.
+  # 
+  # See: https://www.sqlite.org/pragma.html#query_only
+  def set_query_only
+    return if Rails.env.test?
+    
+    connection = ActiveRecord::Base.connection
+    
+    case connection.instance_values["config"][:adapter]
+    when 'sqlite3'
+      connection.execute 'PRAGMA query_only = True'
+      connection.execute 'PRAGMA read_uncommitted = True'
+      connection.execute 'PRAGMA writable_schema = False'
+      connection.execute 'PRAGMA synchronous = OFF'
+      connection.execute 'PRAGMA journal_mode = MEMORY'
+      connection.execute 'PRAGMA temp_store = MEMORY'
+    end
+  end
+  
   def steem_options
     @steem_options ||= {
       url: ENV.fetch('STEEM_NODE_URL', 'https://api.steemit.com'),

@@ -1,12 +1,16 @@
 %h1 Contracts
 
-- cache [contracts_params, head_block_num] do
-  - if @contracts.exists?
+%ul.nav.nav-tabs
+  %li.nav-item= link_to 'Valid', contracts_path, class: 'nav-link' + (params[:only_errors].nil? ? ' active' : '')
+  %li.nav-item= link_to 'Errors', contract_errors_path, class: 'nav-link' + (params[:only_errors] == 'true' ? ' active' : '')
+- cache ['contracts-index', contracts_params, @contracts.map(&:to_param)] do
+  - if @contracts.any?
     = render partial: 'contract', collection: @contracts, cached: true
+    
+    %p
+      = pagy_bootstrap_nav_js(@pagy).html_safe
   - else
     .jumbotron.text-center
       %h5.display-5
         %p No Transactions Found
       %h1 😭
-  
-= will_paginate(@contracts, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)

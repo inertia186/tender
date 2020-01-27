@@ -13,7 +13,7 @@ class TransfersController < ApplicationController
     @transfers = @transfers.where(to: @to) if !!@to
     @transfers = @transfers.where(symbol: @symbol) if @symbol.present? && @symbol != '*'
     @transfers = @transfers.order(Transaction.arel_table[:block_num].desc)
-    @transfers = @transfers.paginate(per_page: @per_page, page: @page)
+    @pagy, @transfers = pagy_countless(@transfers, page: @page, items: @per_page)
     @elapsed = Time.now - @start
   end
 private

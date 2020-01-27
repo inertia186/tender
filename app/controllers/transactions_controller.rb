@@ -5,10 +5,20 @@ class TransactionsController < ApplicationController
     @per_page = (transactions_params[:per_page] || '100').to_i
     @page = (transactions_params[:page] || '1').to_i
     @keywords = transactions_params[:search].to_s.split(' ').reject(&:empty?)
+    @only_errors = params[:only_errors] == 'true'
+    @except_errors = params[:except_errors] == 'true'
     @contract = transactions_params[:contract]
     @contract_action = transactions_params[:contract_action]
     @open_orders = transactions_params[:open_orders]
-    @transactions = Transaction.order(block_num: :desc, trx_in_block: :asc)
+    @transactions = Transaction.consensus_order(:desc)
+    
+    if !!@only_errors
+      @transactions = @transactions.where(is_error: true)
+    end
+    
+    if !!@except_errors
+      @transactions = @transactions.where(is_error: false)
+    end
     
     if !!transactions_params[:account]
       @transactions = @transactions.with_account(transactions_params[:account])
@@ -30,10 +40,16 @@ class TransactionsController < ApplicationController
         keyword = @keywords[0].to_s
         
         if keyword.starts_with? '@'
-          redirect_to account_home_url(keyword[1..-1])
+          redirect_to account_home_url(keyword[1..-1], contract: transactions_params[:contract])
           return
         elsif keyword.starts_with? '$'
-          redirect_to transactions_url(symbol: keyword[1..-1])
+          redirect_to transactions_url(symbol: keyword[1..-1], contract: transactions_params[:contract])
+          return
+        elsif keyword =~ /[a-z]+:[a-z]*/
+          c, a = keyword.split(':')
+          p = {contract: c}
+          p[:contract_action] = a if a.present?
+          redirect_to transactions_url(p)
           return
         elsif (trx_id = keyword.split('-')[0]).size == 40
           redirect_to tx_url(trx_id)
@@ -114,7 +130,7 @@ class TransactionsController < ApplicationController
       @transactions = @transactions.select(fields)
     end
     
-    @transactions = @transactions.paginate(per_page: @per_page, page: @page)
+    @pagy, @transactions = pagy_countless(@transactions, page: @page, items: @per_page)
   end
   
   def open_orders
@@ -137,8 +153,8 @@ private
   
   def fields
     [
-      :block_num, :trx_id, :sender, :contract, :action, :payload, :logs, :updated_at,
-      :timestamp
+      :block_num, :trx_id, :sender, :contract, :action, :payload, :logs,
+      :is_error, :updated_at, :timestamp
     ]
   end
 end

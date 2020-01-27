@@ -87,7 +87,7 @@ class RichlistController < ApplicationController
     respond_to do |format|
       format.json { }
       format.html {
-        @richlist = Kaminari.paginate_array(@richlist).page(@page).per(@per_page)
+        @pagy, @richlist = pagy_array(@richlist, page: @page, items: @per_page)
       }
       format.csv do
         csv_data = CSV.generate(headers: true) do |csv|

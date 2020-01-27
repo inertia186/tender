@@ -10,7 +10,6 @@ class TokensController < ApplicationController
     @tokens = TokensCreate.joins(:trx).includes(:trx)
     @tokens = @tokens.order(Transaction.arel_table[:block_num].asc)
     @tokens = @tokens.where.not(symbol: DISABLED_TOKENS)
-    @tokens = @tokens.paginate(per_page: @per_page, page: @page)
     
     if !!params[:only_stake_enabled]
       @tokens = if params[:only_stake_enabled] == 'true'
@@ -32,6 +31,8 @@ class TokensController < ApplicationController
           not(symbol: TokensEnableStaking.select(:symbol))
       end
     end
+    
+    @pagy, @tokens = pagy_countless(@tokens, page: @page, items: @per_page)
   end
   
   def show

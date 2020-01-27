@@ -66,4 +66,5 @@
                 = link_to account_home_path(balance['account'], symbol: @symbol, contract: 'tokens', contract_action: 'delegate') do
                   = number_with_delimiter "%.#{@token.precision}f" % balance['delegationsIn'].to_f || 0.0
 
-= will_paginate(@richlist, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
+%p
+  = pagy_bootstrap_nav_js(@pagy).html_safe

@@ -4,6 +4,7 @@
 .row
   .col-sm-4
     %h1
+      = link_to '⬅️', contracts_path, style: 'text-decoration: none;'
       Contract:
       %code= @contract.name
   .col-sm-8

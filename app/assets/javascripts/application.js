@@ -19,12 +19,11 @@
 //= require json-formatter
 //= require moment
 //= require highlight_pack
+//= require pagy
 //= require_tree .
 
-// $(document).on('turbolinks:load', function() {
-// });
-
 $(document).on('ready turbolinks:load', function() {
+  Pagy.init();
   
   $('[data-toggle="tooltip"]').tooltip();
   

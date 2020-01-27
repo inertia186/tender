@@ -1,6 +1,10 @@
 class ContractAction < ApplicationRecord
   self.abstract_class = true
   
+  scope :consensus_order, lambda { |consensus_order = :asc|
+    joins(:trx).order(block_num: consensus_order, trx_in_block: consensus_order == :asc ? :desc : :asc, trx_id: consensus_order)
+  }
+  
   after_commit do |obj|
     trx.add_account(obj.trx.sender)
     trx.add_account(obj.from) if obj.respond_to? :from

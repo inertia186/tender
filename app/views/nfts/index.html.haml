@@ -1,4 +1,4 @@
-- cache [TransactionSymbol.where(symbol: @nfts.pluck(:symbol)).maximum(:id), params.to_unsafe_h] do
+- cache ['nfts-index', TransactionSymbol.where(symbol: @nfts.map(&:symbol)).count, nfts_params] do
   .row
     .col-sm-12  
       %table.table.table-striped.table-borderless
@@ -14,4 +14,5 @@
         %tbody
           = render partial: 'nft_row', collection: @nfts, as: :nft
       
-      = will_paginate(@nfts, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
+      %p
+        = pagy_bootstrap_nav_js(@pagy).html_safe

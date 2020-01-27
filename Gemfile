@@ -43,14 +43,12 @@ gem 'radiator', '~> 0.4.6'
 
 gem 'haml', '~> 5.0'
 gem 'bootstrap', '~> 4.3.1'
-gem 'will_paginate', '~> 3.2'
-gem 'bootstrap-will_paginate'
+gem 'pagy', '~> 3.7.2'
 gem 'jquery-rails'
 gem 'json-formatter-rails'
 gem 'momentjs-rails'
 gem 'rails-highlightjs'
 gem 'diffy'
-gem 'kaminari'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

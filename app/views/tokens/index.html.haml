@@ -2,7 +2,7 @@
   %li.nav-item= link_to 'All Tokens', tokens_path, class: 'nav-link' + (params[:only_stake_enabled].nil? && params[:only_scot].nil? ? ' active' : '')
   %li.nav-item= link_to 'Stake Enabled', tokens_path(only_stake_enabled: true), class: 'nav-link' + (params[:only_stake_enabled] == 'true' ? ' active' : '')
   %li.nav-item= link_to 'SCOT', tokens_path(only_scot: true), class: 'nav-link' + (params[:only_scot] == 'true' ? ' active' : '')
-- cache [TransactionSymbol.where(symbol: @tokens.pluck(:symbol)).maximum(:id), params.to_unsafe_h] do
+- cache ['tokens-index', TransactionSymbol.where(symbol: @tokens.map(&:symbol)).count, tokens_params] do
   .row
     .col-sm-12  
       %table.table.table-striped.table-borderless
@@ -18,4 +18,5 @@
         %tbody
           = render partial: 'token_row', collection: @tokens, as: :token
       
-      = will_paginate(@tokens, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
+      %p
+        = pagy_bootstrap_nav_js(@pagy).html_safe

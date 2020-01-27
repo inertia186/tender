@@ -12,6 +12,5 @@
   %td= token.trx.timestamp
   %td
     = link_to transactions_path(symbol: token.symbol) do
-      - trx_id = TransactionSymbol.where(symbol: token.symbol).maximum(:trx_id)
-      %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = Transaction.find(trx_id).timestamp}
+      %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = symbol_active_at(token.symbol)}
         = active_at

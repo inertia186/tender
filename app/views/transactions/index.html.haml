@@ -13,13 +13,14 @@
 - elsif !!transactions_params[:symbol]
   %h1= transactions_params[:symbol]
 
-- cache [transactions_params, head_block_num] do
-  - if @transactions.exists?
+- cache ['transactions-index', transactions_params, head_block_num] do
+  - if @transactions.any?
     = render partial: 'transaction', collection: @transactions, cached: true
   - else
     .jumbotron.text-center
       %h5.display-5
         %p No Transactions Found
       %h1 😭
-  
-= will_paginate(@transactions, renderer: WillPaginate::ActionView::Bootstrap4LinkRenderer)
+
+%p  
+  = pagy_bootstrap_nav_js(@pagy).html_safe

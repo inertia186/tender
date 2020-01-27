@@ -10,7 +10,7 @@ class IssuesController < ApplicationController
     @issues = TokensIssue.joins(:trx).includes(:trx).where(to: @to)
     @issues = @issues.where(symbol: @symbol) if @symbol.present? && @symbol != '*'
     @issues = @issues.order(Transaction.arel_table[:block_num].desc)
-    @issues = @issues.paginate(per_page: @per_page, page: @page)
+    @pagy, @issues = pagy_countless(@issues, page: @page, items: @per_page)
     @elapsed = Time.now - @start
   end
 private
