@@ -18,6 +18,9 @@ class RichlistController < ApplicationController
     
     params.delete(:token_id)
     
+    @richlist = cache ["richlist-data-#{@symbol}"], expires_in: 15.minutes do
+      _richlist = []
+      
     loop do
       sub_list = steem_engine_contracts.find({
         contract: :tokens,
@@ -26,12 +29,15 @@ class RichlistController < ApplicationController
           symbol: @symbol
         },
         limit: @limit || 1000,
-        offset: @richlist.size
+          offset: _richlist.size
       })
       sub_list ||= []
       
       break if sub_list.none?
-      @richlist += sub_list
+        _richlist += sub_list
+      end
+      
+      _richlist
     end
     
     @richlist_count = @richlist.size
@@ -68,6 +74,10 @@ class RichlistController < ApplicationController
     when :influence
       @richlist.sort_by do |balance|
         balance['stake'].to_f + balance['delegationsIn'].to_f
+      end
+    when :owned
+      @richlist.sort_by do |balance|
+        balance['stake'].to_f + balance['delegationsOut'].to_f
       end
     else
       @richlist.sort_by do |balance|

@@ -1,70 +1,71 @@
-.row
-  .col-sm-3
-    %h1= @symbol
-  .col-sm-9
-    .float-right
-      = pluralize @richlist_count, 'account'
-      - if @stake_enabled
-        %br
-        %code
-          = number_with_delimiter "%.#{@token.precision}f" % @total_staked || 0.0
-          &nbsp;
-          = @symbol
-        staked by
-        = pluralize(@total_staked_accounts || 0, 'account')
+- cache ["richlist-#{@symbol}", richlist_params], expires_in: 15.minutes do
+  .row
+    .col-sm-3
+      %h1= @symbol
+    .col-sm-9
+      .float-right
+        = pluralize @richlist_count, 'account'
+        - if @stake_enabled
+          %br
+          %code
+            = number_with_delimiter "%.#{@token.precision}f" % @total_staked || 0.0
+            &nbsp;
+            = @symbol
+          staked by
+          = pluralize(@total_staked_accounts || 0, 'account')
 
-.row
-  .col-sm-12
-    %table.table.table-striped.table-borderless
-      %thead
-        %tr
-          %th
-          %th
-            = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :account_name, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
-              Account
-              - if @sort_field == :account_name
-                = @sort_order == :desc ? '🔽' : '🔼'
-          %th
-            = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :balance, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
-              Balance
-              - if @sort_field == :balance
-                = @sort_order == :desc ? '🔽' : '🔼'
-          - if @stake_enabled
-            %th
-              = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :stake, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
-                Stake
-                - if @sort_field == :stake
-                  = @sort_order == :desc ? '🔽' : '🔼'
-            %th
-              = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :pending_unstake, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
-                Pending Unstake
-                - if @sort_field == :pending_unstake
-                  = @sort_order == :desc ? '🔽' : '🔼'
-            %th
-              = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :delegations_out, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
-                Delegated Stake
-                - if @sort_field == :delegations_out
-                  = @sort_order == :desc ? '🔽' : '🔼'
-            %th
-              = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :delegations_in, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
-                Received Stake
-                - if @sort_field == :delegations_in
-                  = @sort_order == :desc ? '🔽' : '🔼'
-      %tbody
-        - @richlist.each_with_index do |balance, index|
+  .row
+    .col-sm-12
+      %table.table.table-striped.table-borderless
+        %thead
           %tr
-            %td= index + 1 + (@page * @per_page) - @per_page
-            %td= link_to balance['account'], account_home_path(balance['account'])
-            %td= number_with_delimiter "%.#{@token.precision}f" % balance['balance'].to_f || 0.0
+            %th
+            %th
+              = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :account_name, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+                Account
+                - if @sort_field == :account_name
+                  = @sort_order == :desc ? '🔽' : '🔼'
+            %th
+              = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :balance, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+                Balance
+                - if @sort_field == :balance
+                  = @sort_order == :desc ? '🔽' : '🔼'
             - if @stake_enabled
-              %td= number_with_delimiter "%.#{@token.precision}f" % balance['stake'].to_f || 0.0
-              %td= number_with_delimiter "%.#{@token.precision}f" % balance['pendingUnstake'].to_f || 0.0
-              %td
-                = link_to account_home_path(balance['account'], symbol: @symbol, contract: 'tokens', contract_action: 'delegate') do
-                  = number_with_delimiter "%.#{@token.precision}f" % balance['delegationsOut'].to_f || 0.0
-              %td
-                = link_to account_home_path(balance['account'], symbol: @symbol, contract: 'tokens', contract_action: 'delegate') do
-                  = number_with_delimiter "%.#{@token.precision}f" % balance['delegationsIn'].to_f || 0.0
+              %th
+                = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :stake, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+                  Stake
+                  - if @sort_field == :stake
+                    = @sort_order == :desc ? '🔽' : '🔼'
+              %th
+                = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :pending_unstake, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+                  Pending Unstake
+                  - if @sort_field == :pending_unstake
+                    = @sort_order == :desc ? '🔽' : '🔼'
+              %th
+                = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :delegations_out, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+                  Delegated Stake
+                  - if @sort_field == :delegations_out
+                    = @sort_order == :desc ? '🔽' : '🔼'
+              %th
+                = link_to token_richlist_index_path(@symbol, richlist_params.merge(sort_field: :delegations_in, sort_order: richlist_params[:sort_order] == 'desc' ? 'asc' : 'desc')) do
+                  Received Stake
+                  - if @sort_field == :delegations_in
+                    = @sort_order == :desc ? '🔽' : '🔼'
+        %tbody
+          - @richlist.each_with_index do |balance, index|
+            %tr
+              %td= index + 1 + (@page * @per_page) - @per_page
+              %td= link_to balance['account'], account_home_path(balance['account'])
+              %td= number_with_delimiter "%.#{@token.precision}f" % balance['balance'].to_f || 0.0
+              - if @stake_enabled
+                %td= number_with_delimiter "%.#{@token.precision}f" % balance['stake'].to_f || 0.0
+                %td= number_with_delimiter "%.#{@token.precision}f" % balance['pendingUnstake'].to_f || 0.0
+                %td
+                  = link_to account_home_path(balance['account'], symbol: @symbol, contract: 'tokens', contract_action: 'delegate') do
+                    = number_with_delimiter "%.#{@token.precision}f" % balance['delegationsOut'].to_f || 0.0
+                %td
+                  = link_to account_home_path(balance['account'], symbol: @symbol, contract: 'tokens', contract_action: 'delegate') do
+                    = number_with_delimiter "%.#{@token.precision}f" % balance['delegationsIn'].to_f || 0.0
 
-%p
-  = pagy_bootstrap_nav_js(@pagy).html_safe
+  %p
+    = pagy_bootstrap_nav_js(@pagy).html_safe
