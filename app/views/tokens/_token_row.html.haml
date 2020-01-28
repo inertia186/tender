@@ -1,5 +1,7 @@
 %tr
-  %td= token.name.truncate(30)
+  %td
+    = link_to '🔍', token_path(token.symbol), style: 'text-decoration: none;'
+    = token.name.truncate(30)
   - url = JSON[TokensUpdateMetadata.find_by(symbol: token.symbol).try(:metadata) || '{}'].fetch('url', token.url)
   - if !!url
     - url = "https://#{url.sub(/^http(s?):\/\//i, '').strip}"
