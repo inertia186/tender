@@ -26,7 +26,9 @@ class TransactionsController < ApplicationController
     
     if !!transactions_params[:symbol]
       symbol = [transactions_params[:symbol]].flatten.compact.map(&:upcase)
-      @transactions = @transactions.with_symbol(symbol)
+      kind = transactions_params[:kind]
+      kind = kind.nil? ? nil : kind.to_sym
+      @transactions = @transactions.with_symbol(symbol, kind)
     end
     
     @token_balance = if !!transactions_params[:account] && !!transactions_params[:symbol]
@@ -147,7 +149,7 @@ class TransactionsController < ApplicationController
   end
 private
   def transactions_params
-    params.permit(:id, :trx_id, :account, :symbol, :search, :contract,
+    params.permit(:id, :trx_id, :account, :symbol, :kind, :search, :contract,
       :contract_action, :open_orders, :per_page, :page)
   end
   

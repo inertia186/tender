@@ -13,6 +13,6 @@
   %td= nft.hydrated_authorized_issuing_accounts.join(', ')
   %td= nft.trx.timestamp
   %td
-    = link_to transactions_path(symbol: nft.symbol) do
+    = link_to transactions_path(symbol: nft.symbol, kind: :nft) do
       %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = symbol_active_at(nft.symbol)}
         = active_at

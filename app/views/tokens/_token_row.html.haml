@@ -13,6 +13,6 @@
   %td= number_with_delimiter token.max_supply
   %td= token.trx.timestamp
   %td
-    = link_to transactions_path(symbol: token.symbol) do
+    = link_to transactions_path(symbol: token.symbol, kind: :token) do
       %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = symbol_active_at(token.symbol)}
         = active_at
