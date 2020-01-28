@@ -18,15 +18,22 @@
           .col-sm-8
             .float-right
               = form_tag transactions_path, method: :get, class: 'form-inline' do
+                = hidden_field_tag :only_errors, true if params[:only_errors] == 'true'
+                = hidden_field_tag :contract, params[:contract] if !!params[:contract]
                 %span.dropdown.px-5
                   - quick_links = []
+                  - quick_links << link_to("Token Transactions", transactions_path(contract: 'tokens'), class: 'dropdown-item')
+                  - quick_links << link_to("Token Market Transactions", transactions_path(contract: 'market'), class: 'dropdown-item')
+                  - quick_links << link_to("NFT Transactions", transactions_path(contract: 'nft'), class: 'dropdown-item')
+                  - quick_links << link_to("NFT Market Transactions", transactions_path(contract: 'nftmarket'), class: 'dropdown-item')
+                  - quick_links << link_to("Only Error Transactions", transactions_path(only_errors: true), class: 'dropdown-item')
                   - if !!(transfers_to = params[:account] || params[:to])
                     - quick_links << link_to("Transfers To: #{transfers_to}", transfers_path(to: transfers_to), class: 'dropdown-item')
                     - quick_links << link_to("Issued To: #{transfers_to}", issues_path(to: transfers_to), class: 'dropdown-item')
                     - quick_links << link_to("Open Orders: #{transfers_to}", open_orders_path(transfers_to), class: 'dropdown-item')
-                    - if !!(symbol = params[:symbol])
+                    - if !!(symbol = params[:symbol] || @symbol)
                       - quick_links << link_to("Open Orders: #{transfers_to}/#{symbol}", open_orders_path(transfers_to, symbol: symbol), class: 'dropdown-item')
-                  - if !!(symbol = params[:symbol])
+                  - if !!(symbol = params[:symbol] || @symbol)
                     - quick_links << link_to("Open Orders: #{symbol}", transactions_path(open_orders: true, symbol: symbol), class: 'dropdown-item')
                     - quick_links << link_to("Rich List: #{symbol}", token_richlist_index_path(symbol), class: 'dropdown-item')
                   - if quick_links.any?
@@ -35,7 +42,7 @@
                     .dropdown-menu{aria: {labelledby: 'dropdownMenuButton'}}
                       = quick_links.join.html_safe
                 .form-group
-                  = text_field_tag :search, params[:search], class: 'form-control', style: 'width: 16rem', placeholder: 'Account, transaction, or block.', data: {toggle: 'tooltip', placement: 'bottom', html: true}, title: "Note, you can also type: <br /><code>@account</code><br />-or-<br /><code>$symbol</code><br />-or-<br />plain text", autocapitalize: 'none'
+                  = text_field_tag :search, params[:search], class: 'form-control', style: 'width: 16rem', placeholder: 'Account, transaction, or block.', data: {toggle: 'tooltip', placement: 'bottom', html: true}, title: "Note, you can also type: <br /><code>@account</code><br />-or-<br /><code>$symbol</code><br />-or-<br /><code>contract:action</code><br />-or-<br />plain text", autocapitalize: 'none'
       .card-body
         .container-fluid
           - Rails.cache.fetch('replay_detection', expires_in: 10.minutes) do
