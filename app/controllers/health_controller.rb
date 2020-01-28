@@ -1,4 +1,6 @@
 class HealthController < ApplicationController
+  caches_action :index, expires_in: 3.seconds
+  
   def index
     redis_ctx = Redis.new(url: ENV.fetch('REDIS_URL', 'redis://127.0.0.1:6379/0'))
     steem_block_num = redis_ctx.get('steem:meeseeker:last_block_num').to_i

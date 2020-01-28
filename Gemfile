@@ -49,6 +49,7 @@ gem 'json-formatter-rails'
 gem 'momentjs-rails'
 gem 'rails-highlightjs'
 gem 'diffy'
+gem 'actionpack-action_caching'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
