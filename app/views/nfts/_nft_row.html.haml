@@ -1,5 +1,7 @@
 %tr
-  %td= nft.name.truncate(30)
+  %td
+    = link_to '🔍', nft_path(nft.symbol), style: 'text-decoration: none;'
+    = nft.name.truncate(30)
   - url = JSON[TokensUpdateMetadata.find_by(symbol: nft.symbol).try(:metadata) || '{}'].fetch('url', nft.url)
   - if !!url
     - url = "https://#{url.sub(/^http(s?):\/\//i, '').strip}"

@@ -51,6 +51,14 @@
         - elsif transaction.contract == 'tokens' && transaction.action == 'updateParams'
           updated params to
           %code= payload.to_json
+        - elsif transaction.contract == 'nft' && transaction.action == 'addProperty'
+          added property for
+          = link_to payload['symbol'], transactions_path(symbol: payload['symbol'])
+          = surround '(', ')' do
+            name:
+            = payload['name']
+            type:
+            %code<= "#{payload['type']}#{payload['isReadOnly'] ? ' (readonly)' : ''}"
         - else
           .badge.badge-primary= transaction.contract.underscore.humanize.downcase
           .badge.badge-primary= transaction.action.underscore.humanize.downcase

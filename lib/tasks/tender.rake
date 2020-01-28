@@ -118,6 +118,43 @@ namespace :tender do
     end
   end
   
+  desc 'Reindex Steem Engine transactions by contract and action.'
+  task :trx_reindex, [:contract, :action] => :environment do |t, args|
+    contract_name = args[:contract]
+    action_name = args[:action]
+    found_transactions = false
+    
+    abort "Contract and action required." unless !!contract_name && !!action_name
+
+    relation_name = "#{contract_name}_#{action_name.underscore.pluralize}"
+    
+    Transaction.new.send(relation_name) # just testing if the relation exists
+    
+    transactions = Transaction.where(contract: contract_name, action: action_name)
+    
+    transactions.find_each do |trx|
+      begin
+        ActiveRecord::Base.transaction do
+          trx.send(relation_name).destroy_all
+          trx.transaction_accounts.destroy_all
+          trx.transaction_symbols.destroy_all
+          
+          action = trx.send(:parse_contract)
+          
+          if action.kind_of?(ContractAction) && action.persisted?
+            found_transactions = true
+            
+            puts "REINDEXED: steem_engine:#{action.trx.block_num}:#{action.trx.trx_id}:#{action.trx.trx_in_block}:#{action.trx.contract}:#{action.trx.action}"
+          end
+        end
+      rescue => e
+        puts "Skipped #{trx.trx_id} ... (#{e.inspect})"
+      end
+    end
+    
+    abort "Nothing to reindex." unless found_transactions
+  end
+  
   desc 'Verifies there are no block gaps or duplicate transactions on the sidechain.'
   task verify_sidechain: :environment do
     block_agent = Radiator::SSC::Blockchain.new(root_url: ENV.fetch('STEEM_ENGINE_NODE_URL'), persist: false)

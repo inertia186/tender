@@ -12,6 +12,8 @@ class Transaction < ApplicationRecord
   
   VIRTUAL_TRX_ID = '0000000000000000000000000000000000000000'
   
+  NFT_CONTRACTS = %i(nft nftmarket)
+  
   with_options foreign_key: 'trx_id', dependent: :destroy do |trx|
     trx.has_many :contract_deploys
     trx.has_many :contract_updates
@@ -92,8 +94,14 @@ class Transaction < ApplicationRecord
     where(id: TransactionAccount.where(account: account).select(:trx_id))
   }
   
-  scope :with_symbol, lambda { |symbol = nil|
-    where(id: TransactionSymbol.where(symbol: symbol).select(:trx_id))
+  scope :with_symbol, lambda { |symbol = nil, kind = nil|
+    r = case kind
+    when :token then where.not(contract: NFT_CONTRACTS)
+    when :nft then where(contract: NFT_CONTRACTS)
+    else; unscoped
+    end
+    
+    r.where(id: TransactionSymbol.where(symbol: symbol).select(:trx_id))
   }
   
   scope :search, lambda { |options = {}|
@@ -259,7 +267,7 @@ private
       params = hydrated_payload
       params.delete('isSignedWithActiveKey')
       params['action_type'] = params.delete('type') if contract == 'market' && action == 'cancel' && !!params['type']
-      params['property_type'] = params.delete('type') if contract == 'nft' && action == 'add_properties' && !!params['type']
+      params['property_type'] = params.delete('type') if contract == 'nft' && action == 'addProperty' && !!params['type']
       params['action_id'] = params.delete('id') if !!params['id']
       params['tx_id'] = params.delete('txID') if !!params['txID']
       params['amount_steemsbd'] = params.delete('amountSTEEMSBD') if !!params['amountSTEEMSBD']

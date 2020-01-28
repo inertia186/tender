@@ -12,6 +12,12 @@ class ContractAction < ApplicationRecord
     trx.add_account(obj.recipient) if obj.respond_to? :recipient
     trx.add_symbol(obj.symbol) if obj.respond_to? :symbol
     
+    if obj.respond_to? :authorized_issuing_accounts
+      (JSON[obj.authorized_issuing_accounts] rescue []).each do |a|
+        trx.add_account(a)
+      end
+    end
+    
     if !!obj.trx.logs
       if !!obj.trx.hydrated_logs['events']
         obj.trx.hydrated_logs['events'].each do |event|
@@ -25,6 +31,7 @@ class ContractAction < ApplicationRecord
           
           trx.add_account(event['data']['from'])
           trx.add_account(event['data']['to'])
+          trx.add_symbol(event['data']['price_symbol'])
           
           # Various events.
           

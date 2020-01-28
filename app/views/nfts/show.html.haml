@@ -26,13 +26,12 @@
           %th Activity
           %td
             = link_to transactions_path(symbol: @nft.symbol) do
-              %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = Transaction.with_symbol(@nft.symbol).order(block_num: :desc).first.timestamp}
+              %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = symbol_active_at(@nft.symbol)}
                 = active_at
-
-    %table.table.table-striped
-      %tbody
-        - NftAddProperty.where(symbol: @nft.symbol).each do |property|
+        - if @properties.any?
           %tr
-            %th= propery.name
-            %td= propery.type
-            %td= propery.is_read_only
+            %th{cellspan: 2}= link_to 'Properties', transactions_path(contract: 'nft', contract_action: 'addProperty', symbol: @nft.symbol)
+          - @properties.find_each do |property|
+            %tr
+              %th= property.name
+              %td= "#{property.property_type} #{property.is_read_only? ? '(readonly)' : ''}"

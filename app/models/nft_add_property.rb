@@ -6,5 +6,5 @@ class NftAddProperty < ContractAction
   validates_presence_of :symbol
   validates_presence_of :name
   validates_presence_of :property_type
-  validates_presence_of :is_read_only
+  validates_inclusion_of :is_read_only, in: [true, false]
 end
