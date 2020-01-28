@@ -98,7 +98,7 @@ class Transaction < ApplicationRecord
     r = case kind
     when :token then where.not(contract: NFT_CONTRACTS)
     when :nft then where(contract: NFT_CONTRACTS)
-    else; unscoped
+    else; all
     end
     
     r.where(id: TransactionSymbol.where(symbol: symbol).select(:trx_id))
