@@ -31,9 +31,9 @@
                     - quick_links << link_to("Transfers To: #{transfers_to}", transfers_path(to: transfers_to), class: 'dropdown-item')
                     - quick_links << link_to("Issued To: #{transfers_to}", issues_path(to: transfers_to), class: 'dropdown-item')
                     - quick_links << link_to("Open Orders: #{transfers_to}", open_orders_path(transfers_to), class: 'dropdown-item')
-                    - if !!(symbol = params[:symbol] || @symbol)
+                    - if !!(symbol = params[:symbol] || @symbol) && symbol.present?
                       - quick_links << link_to("Open Orders: #{transfers_to}/#{symbol}", open_orders_path(transfers_to, symbol: symbol), class: 'dropdown-item')
-                  - if !!(symbol = params[:symbol] || @symbol)
+                  - if !!(symbol = params[:symbol] || @symbol) && symbol.present?
                     - quick_links << link_to("Open Orders: #{symbol}", transactions_path(open_orders: true, symbol: symbol), class: 'dropdown-item')
                     - quick_links << link_to("Rich List: #{symbol}", token_richlist_index_path(symbol), class: 'dropdown-item')
                   - if quick_links.any?
