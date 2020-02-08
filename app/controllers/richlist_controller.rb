@@ -28,7 +28,7 @@ class RichlistController < ApplicationController
         query: {
           symbol: @symbol
         },
-        limit: @limit || 1000,
+          limit: 1000,
           offset: _richlist.size
       })
       sub_list ||= []
