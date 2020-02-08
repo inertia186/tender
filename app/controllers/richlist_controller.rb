@@ -90,7 +90,7 @@ class RichlistController < ApplicationController
     else; @richlist
     end
     
-    @richlist = @richlist.first(@limit) if !!@limit
+    @richlist = @richlist.first(@limit.to_i) if !!@limit
     
     @elapsed = Time.now - @start
     
