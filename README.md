@@ -6,7 +6,7 @@ Steem Engine sidechain interpreter.
 
 For the most part, Tender is simply a Steem Engine block explorer.  But it's a little more than just that.  It's also a rest endpoint for querying account history.  For example, if you're running an exchange, you can use your own tender node to programmatically query deposits to your exchange.
 
-Running your own node means you won't have to rely on `api.steem-engine.com` to query current sidechain activity.
+Running your own node means you won't have to rely on `api.hive-engine.com` to query current sidechain activity.
 
 To set it up:
 
