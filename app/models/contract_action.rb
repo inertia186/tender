@@ -11,6 +11,7 @@ class ContractAction < ApplicationRecord
     trx.add_account(obj.to) if obj.respond_to? :to
     trx.add_account(obj.recipient) if obj.respond_to? :recipient
     trx.add_symbol(obj.symbol) if obj.respond_to? :symbol
+    trx.add_symbol(obj.witness) if obj.respond_to? :witness
     
     if obj.respond_to? :authorized_issuing_accounts
       (JSON[obj.authorized_issuing_accounts] rescue []).each do |a|
