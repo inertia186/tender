@@ -6,8 +6,4 @@ class CheckpointsController < ApplicationController
     @checkpoints = Checkpoint.order(created_at: :asc)
     @elapsed = Time.now - @start
   end
-private
-  def checkpoints_params
-    params.permit()
-  end
 end
