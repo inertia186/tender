@@ -83,7 +83,7 @@ class TransactionsController < ApplicationController
       }
       
       if !!transactions_params[:account]
-        account = [transactions_params[:account]].flatten
+        account = [transactions_params[:account]].flatten.compact.map(&:downcase)
         
         if account.size == 1
           order_params[:query][:account] = account[0]
@@ -102,20 +102,20 @@ class TransactionsController < ApplicationController
         end
       end
       
-      if (t = steem_engine_contracts.find(order_params.merge(limit: 0, table: 'sellBook'))).nil?
+      if (t = engine_contracts.find(order_params.merge(limit: 0, table: 'sellBook'))).nil?
         # FIXME Here, we are guessing which API version (`mongodb` has different indices).
         
         order_params[:indexes] = [{"index":"_id","descending":true}]
       end
       
-      while (t = steem_engine_contracts.find(order_params.merge(limit: 1000, table: 'buyBook'))).any?
+      while (t = engine_contracts.find(order_params.merge(limit: 1000, table: 'buyBook'))).any?
         open_sells += t
         order_params[:offset] += open_sells.size
       end
       
       order_params[:offset] = 0
       
-      while (t = steem_engine_contracts.find(order_params.merge(limit: 1000, table: 'buyBook'))).any?
+      while (t = engine_contracts.find(order_params.merge(limit: 1000, table: 'buyBook'))).any?
         open_buys += t
         order_params[:offset] += open_buys.size
       end
@@ -132,7 +132,9 @@ class TransactionsController < ApplicationController
       @transactions = @transactions.select(fields)
     end
     
-    @pagy, @transactions = pagy_countless(@transactions, page: @page, items: @per_page)
+    @pagy, @transactions = cache ['transactions-index-data', transactions_params, head_block_num] do
+      pagy_countless(@transactions, page: @page, items: @per_page)
+    end
   end
   
   def open_orders

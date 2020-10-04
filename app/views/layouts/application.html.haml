@@ -2,7 +2,10 @@
 %html
   %head
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
-    %title Steem Engine Block Explorer
+    %title
+      = case mainchain.to_sym
+        - when :steem then 'Steem Engine Block Explorer'
+        - when :hive then 'Hive Engine Block Explorer'
     = csrf_meta_tags
     = csp_meta_tag
     = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
@@ -14,7 +17,12 @@
       .card-header
         .row
           .col-sm-4
-            %h3.text-muted= link_to 'Steem Engine Block Explorer', root_url
+            %h3.text-muted
+              = link_to root_url do
+                = case mainchain.to_sym
+                  - when :steem then 'Steem Engine Block Explorer'
+                  - when :hive then 'Hive Engine Block Explorer'
+
           .col-sm-8
             .float-right
               = form_tag transactions_path, method: :get, class: 'form-inline' do
@@ -54,8 +62,10 @@
         .figure.figure
           .figcaption.figure-caption
             Learn more:
-            = link_to 'Steem Engine', 'https://steem-engine.com/?p=faq&utm_source=tender'
-            \|
+            = case mainchain.to_sym
+              - when :steem then link_to 'Steem Engine', 'https://steem-engine.com/?p=faq&utm_source=tender'
+              - when :hive then link_to 'Hive Engine', 'https://hive-engine.com/?p=faq&utm_source=tender'
+            &nbsp;|
             Source: 
             = link_to 'Tender', 'https://github.com/inertia186/tender'
             \|

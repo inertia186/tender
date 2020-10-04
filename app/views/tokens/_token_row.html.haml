@@ -14,5 +14,5 @@
   %td= token.trx.timestamp
   %td
     = link_to transactions_path(symbol: token.symbol, kind: :token) do
-      %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = symbol_active_at(token.symbol)}
+      %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = symbol_active_at(token.symbol, :token)}
         = active_at

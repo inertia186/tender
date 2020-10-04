@@ -21,19 +21,19 @@ class RichlistController < ApplicationController
     @richlist = cache ["richlist-data-#{@symbol}"], expires_in: 15.minutes do
       _richlist = []
       
-    loop do
-      sub_list = steem_engine_contracts.find({
-        contract: :tokens,
-        table: :balances,
-        query: {
-          symbol: @symbol
-        },
+      loop do
+        sub_list = engine_contracts.find({
+          contract: :tokens,
+          table: :balances,
+          query: {
+            symbol: @symbol
+          },
           limit: 1000,
           offset: _richlist.size
-      })
-      sub_list ||= []
-      
-      break if sub_list.none?
+        })
+        sub_list ||= []
+        
+        break if sub_list.none?
         _richlist += sub_list
       end
       

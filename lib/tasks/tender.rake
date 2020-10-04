@@ -23,10 +23,64 @@ namespace :tender do
   
   desc 'Current header data for latest blocks.log'
   task :block_log_headers do
-    exec 'curl -I "https://api.steem-engine.com/blocks.log"'
+    exec 'curl -I "https://api.hive-engine.com/blocks.log"'
   end
   
-  desc 'Ingest Steem Engine transactions from Meeseeker.'
+  desc 'Dump sidechain transactions from Meeseeker.'
+  task :trx_dump, [:trx_id] => :environment do |t, args|
+    trx_id = args[:trx_id]
+    block_num = trx_id.to_i unless trx_id =~ /\D+/
+    block = nil
+    engine_options ||= {
+      root_url: ENV.fetch('ENGINE_NODE_URL', 'https://api.hive-engine.com/rpc'),
+      persist: false
+    }
+    
+    engine_blockchain = Radiator::SSC::Blockchain.new(engine_options)
+    trxs = if !!block_num
+      block = engine_blockchain.block_info(block_num.to_i)
+      
+      block.transactions + block.virtualTransactions
+    else
+      trx = engine_blockchain.transaction_info(trx_id)
+      block_num = trx['blockNumber']
+      
+      [trx]
+    end
+    
+    block ||= engine_blockchain.block_info(block_num)
+    timestamp = block['timestamp'].sub('T', ' ')
+    
+    trxs.each do |trx|
+      trx_id, trx_in_block = if trx['transactionId'] == 0
+        [Transaction::VIRTUAL_TRX_ID, 0]
+      else
+        trx['transactionId'].split('-')
+      end
+      
+      result = {
+        'block_num' => block_num,
+        'ref_steem_block_num' => trx['refHiveBlockNumber'],
+        'trx_id' => trx_id,
+        'trx_in_block' => trx_in_block.to_i,
+        'sender' => trx['sender'],
+        'contract' => trx['contract'],
+        'action' => trx['action'],
+        'payload' => trx['payload'],
+        'logs' => trx['logs'],
+        'executed_code_hash' => trx['executedCodeHash'],
+        'hash' => trx['hash'],
+        'database_hash' => trx['databaseHash'],
+        'timestamp' => timestamp,
+        'created_at' => timestamp,
+        'updated_at' => timestamp,
+      }
+      
+      puts result.to_yaml
+    end
+  end
+  
+  desc 'Ingest sidechain transactions from Meeseeker.'
   task :trx_ingest, [:drop_redis_keys, :max_transactions, :turbo] => :environment do |t, args|
     start = Time.now
     drop_redis_keys = (args[:drop_redis_keys] || 'true') == 'true'
@@ -59,14 +113,14 @@ namespace :tender do
       end
       
       Transaction.meeseeker_ingest(max_transactions) do |trx, key|
-      puts "INGESTED: #{key}"
+        puts "INGESTED: #{key}"
         keys << key if !!drop_redis_keys
-    end
+      end
       
       processed = keys.size
-    elapsed = Time.now - start
-    processed_per_second = elapsed == 0.0 ? 0.0 : processed / elapsed
-    puts 'Finished in: %.3f seconds; Total Transactions: %d (processed %.3f transactions per second)' % [elapsed, Transaction.count, processed_per_second]
+      elapsed = Time.now - start
+      processed_per_second = elapsed == 0.0 ? 0.0 : processed / elapsed
+      puts 'Finished in: %.3f seconds; Total Transactions: %d (processed %.3f transactions per second)' % [elapsed, Transaction.count, processed_per_second]
       puts 'Committing ...'
     end
     
@@ -78,37 +132,64 @@ namespace :tender do
     puts 'Done!'
   end
   
-  desc 'Ingest Steem Engine orphaned transactions.'
-  task :orphan_trx_ingest, [:max_transactions, :include_virtual_trx] => :environment do |t, args|
+  desc 'Ingest sidechain orphaned transactions.'
+  task :orphan_trx_ingest, [:start_block_num, :max_transactions, :include_virtual_trx, :turbo] => :environment do |t, args|
+    engine_chain_key_prefix = ENV.fetch('ENGINE_CHAIN_KEY_PREFIX', 'hive_engine')
+    start = Time.now
+    start_block_num = (args[:after_block_num] || '0').to_i - 1
     max_transactions = args[:max_transactions]
     include_virtual_trx = (args[:include_virtual_trx] || 'true') == 'true'
-    orphaned_transactions = Transaction.with_logs_errors(false).
-      where.not(id: TransactionAccount.select(:trx_id))
-    found_transactions = false
+    turbo = (args[:turbo] || 'false') == 'true'
+    connection = ActiveRecord::Base.connection
+    keys = []
     
-    if !!max_transactions
-      orphaned_transactions = orphaned_transactions.limit(max_transactions.to_i)
-    end
-    
-    unless !!include_virtual_trx
-      orphaned_transactions = orphaned_transactions.where.not(trx_id: Transaction::VIRTUAL_TRX_ID)
-    end
-    
-    orphaned_transactions.find_each do |trx|
-      begin
-        action = trx.send(:parse_contract)
-        
-        if action.kind_of?(ContractAction) && action.persisted?
-          found_transactions = true
+    ActiveRecord::Base.transaction do
+      if !!turbo
+        case connection.instance_values["config"][:adapter]
+        when 'sqlite3'
+          puts 'Turbo enabled.'
           
-          puts "INGESTED: steem_engine:#{action.trx.block_num}:#{action.trx.trx_id}:#{action.trx.trx_in_block}:#{action.trx.contract}:#{action.trx.action}"
+          connection.execute 'PRAGMA cache_size = 10000'
+          connection.execute 'PRAGMA journal_mode = MEMORY'
+          connection.execute 'PRAGMA temp_store = MEMORY'
         end
-      rescue => e
-        puts "Skipped #{trx.trx_id} ... (#{e.inspect})"
       end
+      
+      orphaned_transactions = Transaction.where('block_num > ?', start_block_num).
+        where(is_error: false).
+        where.not(id: TransactionAccount.select(:trx_id))
+      
+      if !!max_transactions
+        orphaned_transactions = orphaned_transactions.limit(max_transactions.to_i)
+      end
+      
+      unless !!include_virtual_trx
+        orphaned_transactions = orphaned_transactions.where.not(trx_id: Transaction::VIRTUAL_TRX_ID)
+      end
+
+      orphaned_transactions.find_each do |trx|
+        begin
+          action = trx.send(:parse_contract)
+          
+          if action.kind_of?(ContractAction) && action.persisted?
+            key = "#{engine_chain_key_prefix}:#{action.trx.block_num}:#{action.trx.trx_id}:#{action.trx.trx_in_block}:#{action.trx.contract}:#{action.trx.action}"
+            
+            puts "INGESTED: #{key}"
+            keys << key
+          end
+        rescue => e
+          puts "Skipped #{trx.trx_id} ... (#{e.inspect})"
+        end
+      end
+      
+      processed = keys.size
+      elapsed = Time.now - start
+      processed_per_second = elapsed == 0.0 ? 0.0 : processed / elapsed
+      puts 'Finished in: %.3f seconds; Total Transactions: %d (processed %.3f transactions per second)' % [elapsed, Transaction.count, processed_per_second]
+      puts 'Committing ...'
     end
     
-    abort("No orphaned transactions.") unless found_transactions
+    abort("No orphaned transactions.") if keys.size == 0
   end
   
   namespace :trx_ingest do
@@ -118,8 +199,53 @@ namespace :tender do
     end
   end
   
-  desc 'Reindex Steem Engine transactions by contract and action.'
+  desc 'Verify Engine transactions by contract and action.'
+  task :trx_verify, [:start_block_num, :contract, :action] => :environment do |t, args|
+    engine_chain_key_prefix = ENV.fetch('ENGINE_CHAIN_KEY_PREFIX', 'hive_engine')
+    start_block_num = (args[:after_block_num] || '0').to_i - 1
+    contract_name = args[:contract]
+    action_name = args[:action]
+    transactions = Transaction.where('block_num > ?', start_block_num).
+      where(is_error: false)
+      
+    transactions = transactions.where(contract: contract_name) if !!contract_name
+    transactions = transactions.where(action: action_name) if !!action_name
+    
+    transactions.find_each do |trx|
+      block_num = trx.block_num
+      key = "#{engine_chain_key_prefix}:#{block_num}:#{trx.trx_id}:#{trx.trx_in_block}:#{trx.contract}:#{trx.action}"
+      contract_name = trx.contract
+      action_name = trx.action
+      
+      next if contract_name == 'null' && action_name == 'null'
+      
+      relation_name = "#{contract_name}_#{action_name.underscore.pluralize}"
+      
+      unless trx.respond_to? relation_name
+        puts "Unknown action '#{relation_name}' for #{key}"
+        
+        next
+      end
+      
+      begin
+        count = trx.send(relation_name).count
+        
+        if count == 0
+          puts "Unable to find action '#{relation_name}' for #{key}"
+        elsif count > 1
+          puts "Found duplicate actions '#{relation_name}' for #{key}"
+        end
+      rescue => e
+        puts "Unable to find action '#{relation_name}' for #{key} (#{e})"
+      end
+      
+      puts "√ #{key}" if block_num % 1000 == 0
+    end
+  end
+  
+  desc 'Reindex Engine transactions by contract and action.'
   task :trx_reindex, [:contract, :action] => :environment do |t, args|
+    engine_chain_key_prefix = ENV.fetch('ENGINE_CHAIN_KEY_PREFIX', 'hive_engine')
     contract_name = args[:contract]
     action_name = args[:action]
     found_transactions = false
@@ -144,7 +270,7 @@ namespace :tender do
           if action.kind_of?(ContractAction) && action.persisted?
             found_transactions = true
             
-            puts "REINDEXED: steem_engine:#{action.trx.block_num}:#{action.trx.trx_id}:#{action.trx.trx_in_block}:#{action.trx.contract}:#{action.trx.action}"
+            puts "REINDEXED: #{engine_chain_key_prefix}:#{action.trx.block_num}:#{action.trx.trx_id}:#{action.trx.trx_in_block}:#{action.trx.contract}:#{action.trx.action}"
           end
         end
       rescue => e
@@ -157,11 +283,11 @@ namespace :tender do
   
   desc 'Verifies there are no block gaps or duplicate transactions on the sidechain.'
   task verify_sidechain: :environment do
-    block_agent = Radiator::SSC::Blockchain.new(root_url: ENV.fetch('STEEM_ENGINE_NODE_URL'), persist: false)
+    block_agent = Radiator::SSC::Blockchain.new(root_url: ENV.fetch('ENGINE_NODE_URL'), persist: false)
     checkpoints = Checkpoint.all
     verified_checkpoints = 0
-    public_steem_engine_node_url = ENV.fetch('PUBLIC_STEEM_ENGINE_NODE_URL', 'https://api.steem-engine.com/rpc', persist: false)
-    public_block_agent = Radiator::SSC::Blockchain.new(root_url: public_steem_engine_node_url)
+    public_engine_node_url = ENV.fetch('PUBLIC_ENGINE_NODE_URL', 'https://api.hive-engine.com/rpc')
+    public_block_agent = Radiator::SSC::Blockchain.new(root_url: public_engine_node_url, persist: false)
     
     checkpoints.find_each do |checkpoint|
       block = block_agent.block_info(checkpoint.block_num)
@@ -200,7 +326,7 @@ namespace :tender do
     while !!(block = block_agent.block_info(block_num))
       block_num % 1000 == 0 and print '.'
       
-      if true#block_num % Checkpoint::CHECKPOINT_LENGTH == 0
+      if block_num % Checkpoint::CHECKPOINT_LENGTH == 0
         trx = if block.transactions.any?
           block.transactions.first
         else
@@ -215,7 +341,7 @@ namespace :tender do
         public_block = public_block_agent.block_info(block_num)
         
         if block['hash'] != public_block['hash']
-          puts("\nProblem comparing #{ENV['STEEM_ENGINE_NODE_URL']} and #{public_steem_engine_node_url}")
+          puts("\nProblem comparing #{ENV['ENGINE_NODE_URL']} and #{public_engine_node_url}")
           puts("Expect block_hash: #{block['hash']} but got: #{public_block['hash']}")
           abort("Problem detected at block_num: #{block_num}")
         end
@@ -253,6 +379,26 @@ namespace :tender do
     puts "\nVerify complete, ending with block: #{block_num}"
   end
   
+  desc 'Rollback to latest checkpoint.'
+  task rollback: :environment do
+    block_num = Checkpoint.maximum(:block_num) || 0
+    trxs = nil
+    
+    until (trxs = Transaction.where("block_num > ?", block_num)).exists?
+      block_num -= Checkpoint::CHECKPOINT_LENGTH
+    end
+    
+    trxs = if ENV['PRETEND'].nil? || ENV['pretend'] == 'true'
+      puts "Rolling back to block_num: #{block_num} (pretend mode)"
+      trxs
+    elsif ENV['PRETEND'] == 'false'
+      puts "Rolling back to block_num: #{block_num}"
+      trxs.destroy_all
+    end
+    
+    puts "Done.  Transactions destroyed: #{trxs.count}"
+  end
+  
   task find_typo_accounts: :environment do
     valid_account_names = Transaction.distinct.pluck(:sender)
     account_names = TokensTransferOwnership.distinct.pluck(:to)
@@ -260,7 +406,7 @@ namespace :tender do
     account_names += TokensIssue.distinct.pluck(:to)
     account_names = account_names.map(&:downcase).uniq - valid_account_names
     typo_account_names = {}
-    steem_engine_contracts = Radiator::SSC::Contracts.new(root_url: ENV.fetch('STEEM_ENGINE_NODE_URL', 'https://api.steem-engine.com/rpc'))
+    engine_contracts = Radiator::SSC::Contracts.new(root_url: ENV.fetch('ENGINE_NODE_URL', 'https://api.hive-engine.com/rpc'))
 
     puts 'All accounts: %d ' % account_names.size
     
@@ -287,7 +433,7 @@ namespace :tender do
     puts "\nTypo accounts: %d" % typo_account_names.size
     
     typo_account_names.each do |k, v|
-      typo_account_names[k] = steem_engine_contracts.find(
+      typo_account_names[k] = engine_contracts.find(
         contract: :tokens,
         table: :balances,
         query: {
