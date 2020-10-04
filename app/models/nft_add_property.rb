@@ -7,4 +7,8 @@ class NftAddProperty < ContractAction
   validates_presence_of :name
   validates_presence_of :property_type
   validates_inclusion_of :is_read_only, in: [true, false]
+  
+  def hydrated_authorized_issuing_accounts
+    @authorized_issuing_accounts ||= JSON[authorized_issuing_accounts] rescue {}
+  end
 end

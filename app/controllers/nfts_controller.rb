@@ -22,6 +22,7 @@ class NftsController < ApplicationController
     @nft = NftCreate.find_by!(symbol: @symbol)
     @elapsed = Time.now - @start
     @properties = NftAddProperty.where(symbol: @nft.symbol)
+    @metadata = NftUpdateMetadata.where(symbol: @nft.symbol).first
   end
 private
   def nfts_params

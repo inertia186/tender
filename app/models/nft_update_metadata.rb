@@ -5,4 +5,8 @@ class NftUpdateMetadata < ContractAction
   validates_presence_of :trx
   validates_presence_of :symbol
   validates_presence_of :metadata
+  
+  def hydrated_metadata
+    @metadata ||= JSON[metadata] rescue []
+  end
 end

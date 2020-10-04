@@ -7,12 +7,28 @@
         %span.symbol= link_to @nft.symbol, URI.parse(url).to_s rescue @nft.symbol
       \-
       = @nft.name
+    
+      - if !!@metadata
+        - (JSON[@metadata.metadata] rescue {}).each do |k, v|
+          - next unless k == 'icon'
+          - next unless v.present?
+          - icon_url = URI(v) rescue nil
+          - if !!icon_url
+            %span
+              %img.float-right{src: icon_url, width: 48, height: 48}
 
     %table.table.table-striped
       %tbody
         %tr
           %th Issuer
           %td= link_to @nft.trx.sender, account_home_path(@nft.trx.sender)
+        - if !!@metadata
+          - (JSON[@metadata.metadata] rescue {}).each do |k, v|
+            - next if k == 'icon'
+            
+            %tr
+              %th= k
+              %td= v
         %tr
           %th Max Supply
           %td= number_with_delimiter @nft.max_supply
@@ -26,7 +42,7 @@
           %th Activity
           %td
             = link_to transactions_path(symbol: @nft.symbol) do
-              %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = symbol_active_at(@nft.symbol)}
+              %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = symbol_active_at(@nft.symbol, :nft)}
                 = active_at
         - if @properties.any?
           %tr

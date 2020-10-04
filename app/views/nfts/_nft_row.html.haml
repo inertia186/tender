@@ -14,5 +14,5 @@
   %td= nft.trx.timestamp
   %td
     = link_to transactions_path(symbol: nft.symbol, kind: :nft) do
-      %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = symbol_active_at(nft.symbol)}
+      %time{data: {toggle: 'tooltip', placement: 'right'}, title: active_at = symbol_active_at(nft.symbol, :nft)}
         = active_at

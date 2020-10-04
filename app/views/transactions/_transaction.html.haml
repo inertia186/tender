@@ -51,6 +51,20 @@
         - elsif transaction.contract == 'tokens' && transaction.action == 'updateParams'
           updated params to
           %code= payload.to_json
+        - elsif transaction.contract == 'nft' && transaction.action == 'issue'
+          issued
+          %code= payload['symbol']
+          - if !!payload['to']
+            to
+            = link_to payload['to'], account_home_path(payload['to'])
+          - if !!logs['events']
+            .d-flex.align-content-around.flex-wrap
+              = render partial: 'nft_event', collection: logs['events']
+        - elsif transaction.contract == 'nft' && transaction.action == 'issueMultiple'
+          issued multiple
+          %code= payload['instances'].map{|p| p['symbol']}.uniq.join(', ')
+          to
+          = payload['instances'].map{|p| link_to p['to'], account_home_path(p['to'])}.uniq.join(', ').html_safe
         - elsif transaction.contract == 'nft' && transaction.action == 'addProperty'
           added property for
           = link_to payload['symbol'], transactions_path(symbol: payload['symbol'])
@@ -68,8 +82,11 @@
                 = link_to "original transaction #{payload['type']}", tx_path(payload['id'])
             - elsif !!payload['quantity']
               %code= number_with_delimiter(payload['quantity']) + ' ' + payload['symbol']
-              %span.text-muted @
-              %code= number_with_delimiter(payload['price']) + ' STEEMP'
+              - if !!payload['price']
+                %span.text-muted @
+                %code= number_with_delimiter(payload['price']) + ' ' + core_symbol
+              - else
+                @ No price.
           - else
             %span{title: JSON.pretty_generate(payload)} •
           - if !!logs['events']

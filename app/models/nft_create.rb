@@ -10,6 +10,10 @@ class NftCreate < ContractAction
   
   validates_uniqueness_of :symbol
   
+  before_validation do
+    self.authorized_issuing_accounts ||= '[]'
+  end
+  
   def hydrated_authorized_issuing_accounts
     @authorized_issuing_accounts ||= JSON[authorized_issuing_accounts] rescue {}
   end

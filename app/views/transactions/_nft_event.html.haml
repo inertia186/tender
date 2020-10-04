@@ -1,0 +1,5 @@
+- nft_event['data'].select{|k, v| k == 'properties'}.each do |k, v|
+  - v.each do |key, value|
+    .badge-pill.badge-light.p-1.inset-shadow
+      .bd-highlight.d-flex.align-content-around.flex-wrap
+        .bd-highlight= "#{key}: #{value}&nbsp;".html_safe

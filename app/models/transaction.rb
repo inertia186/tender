@@ -41,12 +41,30 @@ class Transaction < ApplicationRecord
     trx.has_many :tokens_update_params, class_name: 'TokensUpdateParams'
     trx.has_many :tokens_update_precisions
     trx.has_many :tokens_update_urls
+    trx.has_many :nft_add_authorized_issuing_accounts, class_name: 'NftAddAuthorizedIssuingAccounts'
+    trx.has_many :nft_add_authorized_issuing_contracts, class_name: 'NftAddAuthorizedIssuingContracts'
     trx.has_many :nft_add_properties
     trx.has_many :nft_creates
     trx.has_many :nft_issues
-    trx.has_many :nft_update_metadata, class_name: 'nftUpdateMetadata'
+    trx.has_many :nft_issue_multiples
+    trx.has_many :nft_remove_authorized_issuing_accounts, class_name: 'NftRemoveAuthorizedIssuingAccounts'
+    trx.has_many :nft_remove_authorized_issuing_contracts, class_name: 'NftRemoveAuthorizedIssuingContracts'
+    trx.has_many :nft_set_group_bys, class_name: 'NftSetGroupBy'
+    trx.has_many :nft_transfers
+    trx.has_many :nft_undelegates
+    trx.has_many :nft_transfer_ownerships
+    trx.has_many :nft_burns
+    trx.has_many :nft_set_properties, class_name: 'NftSetProperties'
+    trx.has_many :nft_set_property_permissions, class_name: 'NftSetPropertyPermissions'
+    trx.has_many :nft_delegates
+    trx.has_many :nft_enable_delegations
+    trx.has_many :nft_update_metadata, class_name: 'NftUpdateMetadata'
     trx.has_many :nft_update_names
     trx.has_many :nftmarket_enable_markets
+    trx.has_many :nftmarket_change_prices
+    trx.has_many :nftmarket_cancels
+    trx.has_many :nftmarket_buys
+    trx.has_many :nftmarket_sells
   end
   
   has_many :transaction_accounts, foreign_key: 'trx_id', dependent: :destroy
