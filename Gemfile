@@ -84,6 +84,7 @@ group :test do
   # system tests with Chrome
   gem 'webdrivers'
   gem 'simplecov', '~> 0.16'
+  gem 'mock_redis', require: false
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

@@ -163,6 +163,7 @@ GEM
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.14.0)
+    mock_redis (0.26.0)
     momentjs-rails (2.20.1)
       railties (>= 3.1)
     msgpack (1.3.1)
@@ -345,6 +346,7 @@ DEPENDENCIES
   json-formatter-rails
   listen (~> 3.2)
   memory_profiler
+  mock_redis
   momentjs-rails
   pagy (~> 3.7.2)
   pry (~> 0.12)

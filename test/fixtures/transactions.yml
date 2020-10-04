@@ -69,6 +69,23 @@ genesis_tokens_update_metadata:
   created_at: '2018-06-01T00:00:00'
   updated_at: '2018-06-01T00:00:00'
 
+genesis_tokens_update_params:
+  block_num: 0
+  ref_steem_block_num: 41967000
+  trx_id: '0000000000000000000000000000000000000000'
+  trx_in_block: 0
+  sender: hive-engine
+  contract: tokens
+  action: updateParams
+  payload: '{ "tokenCreationFee": "100", "enableDelegationFee": "1000", "enableStakingFee": "1000" }'
+  logs: "{}"
+  executed_code_hash: 9f4e5ec54de1c9ca9365646184ee91d80260f795b6dada8a922ddca8ad4b3e10
+  hash: 9c16a15f0268257c6e7189a3a04fc29d086875ad658c2c4545b9dae438d21c15
+  database_hash: 21b383a0ed1d8a389e99f46c65b1ff8fc1b82d4baba443fd13ad9da664182a9a
+  timestamp: '2018-06-01 00:00:00'
+  created_at: '2018-06-01 00:00:00'
+  updated_at: '2018-06-01 00:00:00'
+
 contract_update:
   block_num: 1
   ref_steem_block_num: 33736228
@@ -256,6 +273,23 @@ tokens_check_pending_unstakes_null:
   created_at: '2019-06-12 15:41:03'
   updated_at: '2019-06-12 15:41:03'
 
+tokens_check_pending_undelegations_null:
+  block_num: 11
+  ref_steem_block_num: 33967951
+  trx_id: '0000000000000000000000000000000000000000'
+  trx_in_block: 1
+  sender: 'null'
+  contract: tokens
+  action: checkPendingUndelegations
+  payload: ''
+  executed_code_hash: 9b7842accfa06f64fbd04a1335972bf0c714f117801424af0580061d1410c38f
+  hash: a915fddd090cee6ff3b7e2b429e6f9214ea49427f37d70a2e64727ae78d4c8db
+  database_hash: 7e9c2e3622621180124ccaf795d8b4a8a7511938d9f75fe5fabb5d6964388951
+  logs: '{"events":[{"contract":"tokens","event":"undelegateDone","data":{"account":"suddenly12","symbol":"ZZAN","quantity":"158000"}}]}'
+  timestamp: '2019-06-12 15:41:03'
+  created_at: '2019-06-12 15:41:03'
+  updated_at: '2019-06-12 15:41:03'
+
 tokens_delegate_alice_eng:
   block_num: 12
   ref_steem_block_num: 33967632
@@ -341,9 +375,73 @@ tokens_transfer_ownership_alice_bob_eng:
   created_at: '2019-06-12 15:41:03'
   updated_at: '2019-06-12 15:41:03'
 
-#tokens_transfer_to_contract_alice_eng:
-  #block_num: 17
-  # TODO
+tokens_delegate:
+  block_num: 464
+  ref_steem_block_num: 42228147
+  trx_id: c5668ff522e51b01382de9653be1cad81aa32e21
+  trx_in_block: 0
+  sender: eonwarped
+  contract: tokens
+  action: delegate
+  payload: '{"to":"bluerobo","symbol":"TEST.EON","quantity":"25","isSignedWithActiveKey":true}'
+  logs: '{"events":[{"contract":"tokens","event":"delegate","data":{"to":"bluerobo","symbol":"TEST.EON","quantity":"25"}}]}'
+  executed_code_hash: 9f4e5ec54de1c9ca9365646184ee91d80260f795b6dada8a922ddca8ad4b3e10
+  hash: 2c3be998b44d059a25ac2ecc4fd648795788ec3ce3e16de309a197878c15f248
+  database_hash: 8f3e88bece46eb3a3ef61d69a8c7e8d5497aae7eb3fa2d078d22c903835d633c
+  timestamp: '2020-04-03 21:17:21'
+  created_at: '2020-04-03 21:17:21'
+  updated_at: '2020-04-03 21:17:21'
+
+tokens_undelegate:
+  block_num: 505
+  ref_steem_block_num: 42248161
+  trx_id: 691bfa8c333d3810945300fdcbd676cea54c68f9
+  trx_in_block: 0
+  sender: eonwarped
+  contract: tokens
+  action: undelegate
+  payload: '{"from":"eonwarp","symbol":"TEST.EON","quantity":"11","isSignedWithActiveKey":true}'
+  logs: '{"events":[{"contract":"tokens","event":"undelegateStart","data":{"from":"eonwarp","symbol":"TEST.EON","quantity":"11"}}]}'
+  executed_code_hash: 9f4e5ec54de1c9ca9365646184ee91d80260f795b6dada8a922ddca8ad4b3e10
+  hash: 2f783174323e9a570a2caf89eeccd128345b8a105834d8414e1234fc8d032af5
+  database_hash: 624df668b91f6b89a0e596fe5318cc739be43201596472a479ec28e604443aaf
+  timestamp: '2020-04-04 14:01:51'
+  created_at: '2020-04-04 14:01:51'
+  updated_at: '2020-04-04 14:01:51'
+
+tokens_check_pending_undelegations:
+  block_num: 7460
+  ref_steem_block_num: 42535136
+  trx_id: '42535136'
+  trx_in_block: 1
+  sender: 'null'
+  contract: tokens
+  action: checkPendingUndelegations
+  payload: ''
+  logs: '{"events":[{"contract":"tokens","event":"undelegateDone","data":{"account":"eonwarped","symbol":"TEST.EON","quantity":"11"}}]}'
+  executed_code_hash: 9f4e5ec54de1c9ca9365646184ee91d80260f795b6dada8a922ddca8ad4b3e10
+  hash: ab436cef7d1f817997054b8873684c4d3ca966c8aad518824fcd2eddb683be12
+  database_hash: d911bf351ee3f8871f76cf639faa4a01af56cf1cee6e3a260336f0a78cc2a748
+  timestamp: '2020-04-14 14:01:51'
+  created_at: '2020-04-14 14:01:51'
+  updated_at: '2020-04-14 14:01:51'
+
+hivepegged_buy:
+  block_num: 17
+  ref_steem_block_num: 41968785
+  trx_id: 648ea8443d6e75d3b1715c13dfb860076a4f8592
+  trx_in_block: 0
+  sender: steemsc
+  contract: hivepegged
+  action: buy
+  payload: '{"recipient":"honey-swap","amountHIVEHBD":"1.000 HIVE","isSignedWithActiveKey":true}'
+  logs: '{"events":[{"contract":"tokens","event":"transfer","data":{"from":"honey-swap","to":"steemsc","symbol":"SWAP.HIVE","quantity":"0.990"}}]}'
+  executed_code_hash: b220418036c5b78431ebd92327e1d14a5caa71039a357fe452c60a457e8e78259f4e5ec54de1c9ca9365646184ee91d80260f795b6dada8a922ddca8ad4b3e10
+  hash: ed087a30a9f56cea443df9fc9859ca50a6283abb4da2f8a183577ae221a4c260
+  database_hash: 9e6e680d7c2afad16ce2818e6d057e2719fe72d27e26e281dfa1daeefc03065b
+  timestamp: '2020-03-25 20:08:48'
+  created_at: '2020-03-25 20:08:48'
+  updated_at: '2020-03-25 20:08:48'
 
 tokens_transfer_alice_bob_eng:
   block_num: 18
@@ -357,6 +455,23 @@ tokens_transfer_alice_bob_eng:
   executed_code_hash: 25ea2894b20962169300187e238b7e8dd4bb52ac2e6ad1dcb66c2c3e188c426c
   hash: 41f2bf129a975ba922d008c809691600f69eb9fe7f04c80be6ae1d79afa50a17
   database_hash: 65f668243d8adf4e9825896af3977ce5029e49cca4964e5eeab1e6617dac8966
+  logs: '{"events":[{"contract":"tokens","event":"transfer","data":{"from":"alice","to":"bob","symbol":"ENG","quantity":"0.044"}}]}'
+  timestamp: '2019-06-12 15:41:03'
+  created_at: '2019-06-12 15:41:03'
+  updated_at: '2019-06-12 15:41:03'
+
+tokens_transfer_alice_bob_eng_memo_null:
+  block_num: 18
+  ref_steem_block_num: 33967987
+  trx_id: af3500973f006e7fc9764743b61840cdb1484a21
+  trx_in_block: 1
+  sender: alice
+  contract: tokens
+  action: transfer
+  payload: '{"symbol":"ENG","to":"bob","quantity":"0.044","memo":null,"isSignedWithActiveKey":true}'
+  executed_code_hash: fake25ea2894b20962169300187e238b7e8dd4bb52ac2e6ad1dcb66c2c3e188c426c
+  hash: fake41f2bf129a975ba922d008c809691600f69eb9fe7f04c80be6ae1d79afa50a17
+  database_hash: fake65f668243d8adf4e9825896af3977ce5029e49cca4964e5eeab1e6617dac8966
   logs: '{"events":[{"contract":"tokens","event":"transfer","data":{"from":"alice","to":"bob","symbol":"ENG","quantity":"0.044"}}]}'
   timestamp: '2019-06-12 15:41:03'
   created_at: '2019-06-12 15:41:03'
@@ -430,3 +545,380 @@ tokens_update_url_alice_eng:
   timestamp: '2019-06-12 15:41:03'
   created_at: '2019-06-12 15:41:03'
   updated_at: '2019-06-12 15:41:03'
+
+# tokens_issue_to_contract:
+  # TODO
+
+tokens_transfer_to_contract:
+  block_num: 17588
+  ref_steem_block_num: 42642566
+  trx_id: 5f0843e672868f3eb31b7c93fff0e8ea394f3267
+  trx_in_block: 0
+  sender: cryptomancer
+  contract: tokens
+  action: transferToContract
+  payload: '{"symbol":"BEE","quantity":"300","to":"crittermanager","isSignedWithActiveKey":true}'
+  logs: '{"events":[{"contract":"tokens","event":"transferToContract","data":{"from":"cryptomancer","to":"crittermanager","symbol":"BEE","quantity":"300"}}]}'
+  executed_code_hash: 9f4e5ec54de1c9ca9365646184ee91d80260f795b6dada8a922ddca8ad4b3e10
+  hash: 286a09d42eda25e41ccfa2be4633f5cd50f3422942935ad040662aa103ba03a9
+  database_hash: e392895b044bb377a5511e0c21d4b44186344c352388c7626428808114a7047f
+  timestamp: '2020-04-18 07:51:15'
+  created_at: '2020-04-18 07:51:15'
+  updated_at: '2020-04-18 07:51:15'
+
+tokens_check_pending_unstakes:
+  block_num: 3766
+  ref_steem_block_num: 42428887
+  trx_id: '42428887'
+  trx_in_block: 0
+  sender: 'null'
+  contract: tokens
+  action: checkPendingUnstakes
+  payload: ''
+  logs: '{"events":[{"contract":"tokens","event":"unstake","data":{"account":"eonwarp","symbol":"TEST.EON","quantity":"2.500"}}]}'
+  executed_code_hash: 9f4e5ec54de1c9ca9365646184ee91d80260f795b6dada8a922ddca8ad4b3e10
+  hash: 2481624a5e2e8c937933406f885adcb926b86dea39da8463106e785299783ff4
+  database_hash: 9f6940f96b1d0243934030de3ac1f28bafc530f5a909f5f485f767642dbeacbc
+  timestamp: '2020-04-10 21:11:09'
+  created_at: '2020-04-10 21:11:09'
+  updated_at: '2020-04-10 21:11:09'
+
+market_unlock_tokens:
+  block_num: 23
+  ref_steem_block_num: 36512595
+  trx_id: 969ed194a5b09f4769f4bf563175f2385be14dbe
+  trx_in_block: 0
+  sender: steemsc
+  contract: market
+  action: unlockTokens
+  payload: '{"recipient":"steemsc","amountSTEEMSBD":"0.001 STEEM","isSignedWithActiveKey":true}'
+  executed_code_hash: 615c44efce3387570b9aca6c88b3595b2d254010d81af57ec70dcb55cbb7918b9b7842accfa06f64fbd04a1335972bf0c714f117801424af0580061d1410c38f
+  hash: 347551393aee064636ae0ecc812308f551316e0614672b6216a77aac7c2b5399
+  database_hash: dd42b233edc9f7df83fc701a6ef3ca910a396862b6c78b823da6f9c5d6b607dc
+  logs: '{\"events":[{"contract":"tokens","event":"transferFromContract","data":{"from":"market","to":"steem-peg","symbol":"STEEMP","quantity":"4880.97918372"}}]}'
+  timestamp: '2019-06-12 15:41:03'
+  created_at: '2019-06-12 15:41:03'
+  updated_at: '2019-06-12 15:41:03'
+
+nft_create:
+  block_num: 24
+  ref_steem_block_num: 47175817
+  trx_id: bc81a6756d3b1839e06d2d08f7a6140364ccf633
+  trx_in_block: 0
+  sender: fg123
+  contract: nft
+  action: create
+  payload: '{"symbol": "PFG", "name": "Project FG", "is_signed_with_active_key": true}'
+  logs: '{"events": [{"contract": "tokens", "event": "transfer", "data": {"from": "fg123", "to": "null", "symbol": "ENG", "quantity": "100"}}]}'
+  executed_code_hash: f8dab03e3edcd92bbed080f3691c54d97796f30c7024a8eca2c9eb89191ead6fd3ab1afa743f5322eb1b5da7ada99c43f7d26f47cfaab98acb9322c929b23ea6
+  hash: c55225902c4a8686c2b8f0f3be9c51561a97bda37dd6b295dbb0f40614d7c6d1
+  database_hash: 6c2d622c094a3beb2de90533267067aa46055d7e68e6564c49aaa1280ddcc32c
+  timestamp: '2020-09-25 12:38:48'
+  created_at: '2020-09-25 12:38:48'
+  updated_at: '2020-09-25 12:38:48'
+
+nft_create_city:
+  block_num: 14171
+  ref_steem_block_num: 42616342
+  trx_id: f5ece9bf0e52a50faa3698aa17ca5e84263aea6c
+  trx_in_block: 0
+  sender: gerber
+  contract: nft
+  action: create
+  payload: "{\"symbol\":\"CITY\",\"name\":\"dCITY NFT TOKEN\",\"orgName\":\"dCITY Game Inc\",\"productName\":\"dCity Game\",\"url\":\"https://dcity.io\",\"authorizedIssuingAccounts\":[\"gerber\",\"dcitycards\",\"dcity1\"],\"isSignedWithActiveKey\":true}"
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b9f4e5ec54de1c9ca9365646184ee91d80260f795b6dada8a922ddca8ad4b3e10"
+  hash: -2610399411660257483
+  database_hash: 3ee900eeea609b5a630811f061e1a1e3140a7e839a85fd2ed3c5b026008e3a3e
+  logs: "{\"events\":[{\"contract\":\"tokens\",\"event\":\"transfer\",\"data\":{\"from\":\"gerber\",\"to\":\"null\",\"symbol\":\"BEE\",\"quantity\":\"100\"}}]}"
+  timestamp: "2020-04-17 09:55:45"
+  created_at: "2020-04-18 20:26:16"
+  updated_at: "2020-04-18 20:26:16"
+
+nft_transfer_city:
+  block_num: 53033
+  ref_steem_block_num: 42815360
+  trx_id: 35e7fab99525d420f60c0bb4387451a55c157707
+  trx_in_block: 0
+  sender: mys
+  contract: nft
+  action: transfer
+  payload: "{\"to\":\"dominuus\",\"toType\":\"user\",\"nfts\":[{\"symbol\":\"CITY\",\"ids\":[\"3145\"]}],\"isSignedWithActiveKey\":true}"
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: 3018501323960362024
+  database_hash: a2f801149a5eb80b0a1e42fa411a53b8f3057a983b22ac69335188699bed673b
+  logs: "{\"events\":[{\"contract\":\"nft\",\"event\":\"transfer\",\"data\":{\"from\":\"mys\",\"fromType\":\"u\",\"to\":\"dominuus\",\"toType\":\"u\",\"symbol\":\"CITY\",\"id\":\"3145\"}}]}"
+  timestamp: "2020-04-24 08:19:18"
+  created_at: "2020-05-01 15:54:24"
+  updated_at: "2020-05-01 15:54:24"
+
+nft_delegate_city:
+  block_num: 53033
+  ref_steem_block_num: 42815360
+  trx_id: 35e7fab99525d420f60c0bb4387451a55c157707
+  trx_in_block: 1
+  sender: mys
+  contract: nft
+  action: delegate
+  payload: "{\"to\":\"dominuus\",\"toType\":\"user\",\"nfts\":[{\"symbol\":\"CITY\",\"ids\":[\"3145\"]}],\"isSignedWithActiveKey\":true}"
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: 3018501323960362025
+  database_hash: a2f801149a5eb80b0a1e42fa411a53b8f3057a983b22ac69335188699bed673b
+  logs: "{\"events\":[{\"contract\":\"nft\",\"event\":\"delegate\",\"data\":{\"from\":\"mys\",\"fromType\":\"u\",\"to\":\"dominuus\",\"toType\":\"u\",\"symbol\":\"CITY\",\"id\":\"3145\"}}]}"
+  timestamp: "2020-04-24 08:19:18"
+  created_at: "2020-05-01 15:54:24"
+  updated_at: "2020-05-01 15:54:24"
+  
+nft_undelegate_city:
+  block_num: 53033
+  ref_steem_block_num: 42815360
+  trx_id: 35e7fab99525d420f60c0bb4387451a55c157707
+  trx_in_block: 2
+  sender: mys
+  contract: nft
+  action: undelegate
+  payload: "{\"from\":\"dominuus\",\"fromType\":\"user\",\"nfts\":[{\"symbol\":\"CITY\",\"ids\":[\"3145\"]}],\"isSignedWithActiveKey\":true}"
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: 3018501323960362026
+  database_hash: a2f801149a5eb80b0a1e42fa411a53b8f3057a983b22ac69335188699bed673b
+  logs: "{\"events\":[{\"contract\":\"nft\",\"event\":\"undelegate\",\"data\":{\"from\":\"mys\",\"fromType\":\"u\",\"to\":\"dominuus\",\"toType\":\"u\",\"symbol\":\"CITY\",\"id\":\"3145\"}}]}"
+  timestamp: "2020-04-24 08:19:18"
+  created_at: "2020-05-01 15:54:24"
+  updated_at: "2020-05-01 15:54:24"
+
+nft_issue_city:
+  block_num: 2224625
+  ref_steem_block_num: 47396064
+  trx_id: "e44a18c250c63f87a1401c9539e445f2a6b53786"
+  trx_in_block: 0
+  sender: "dcity1"
+  contract: "nft"
+  action: "issue"
+  payload: '{"symbol": "CITY", "to": "upali", "fee_symbol": "BEE", "properties": {"name": "Homeless", "population": 1, "popularity": -1, "type": "citizen"}, "lock_tokens": {"sim": "1"}, "is_signed_with_active_key": true}'
+  logs: '{"events": [{"contract": "tokens", "event": "transfer", "data": {"from": "dcity1", "to": "null", "symbol": "BEE", "quantity": "0.00900000"}}, {"contract": "tokens", "event": "transferToContract", "data": {"from": "dcity1", "to": "nft", "symbol": "SIM", "quantity": "1"}}, {"contract": "nft", "event": "issue", "data": {"from": "dcity1", "from_type": "user", "to": "upali", "to_type": "user", "symbol": "CITY", "locked_tokens": {"sim": "1"}, "locked_nfts": [], "properties": {"name": "Homeless", "population": 1, "popularity": -1, "type": "citizen"}, "id": 399883}}]}'
+  executed_code_hash: "a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108bb39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9"
+  hash: "1e872ab687c12ad8c45c1f3f571ef589b6bf749960823b91b0ef110ebba6ef10"
+  database_hash: "75f08dae023b1c8efa63ba9c19a81e894f6c59b16fbac151fbd551fa7b1eb658"
+  timestamp: "2020-09-30 19:45:15"
+  created_at: "2020-09-30 19:45:15"
+  updated_at: "2020-09-30 19:45:15"
+    
+nft_burn_city:
+  block_num: 2225870
+  ref_steem_block_num: 47397923
+  trx_id: 26c896b0b5c64cc58e3cb8b86a63f185398c93f3
+  trx_in_block: 0
+  sender: dm312
+  contract: nft
+  action: burn
+  payload: '{"nfts":[{"symbol":"CITY","ids":["2873"]}],"isSignedWithActiveKey":true}'
+  logs: '{"events":[{"contract":"tokens","event":"transferFromContract","data":{"from":"nft","to":"dm312","symbol":"SIM","quantity":"5"}},{"contract":"nft","event":"burn","data":{"account":"dm312","ownedBy":"u","unlockedTokens":{"SIM":"5"},"unlockedNfts":[],"symbol":"CITY","id":"2873"}}]}'
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108bb39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9
+  hash: a410ae5ff0fc2f7abe9e0b13c7a0c38f799935c9cdb6c17992f513003f3877a3
+  database_hash: 3f1d2fc19c23b4a569465e636b633744462a3eee2940f509a3596519ba971cf4
+  timestamp: '2020-09-30 21:18:21'
+  created_at: '2020-09-30 21:18:21'
+  updated_at: '2020-09-30 21:18:21'
+
+nft_set_properties_city:
+  block_num: 2223335
+  ref_steem_block_num: 47394085
+  trx_id: dc5bcb8e3ee80d302c77f3d9d89e8122dbf7bee4
+  trx_in_block: 0
+  sender: dcity1
+  contract: nft
+  action: setProperties
+  payload: '{"symbol":"CITY","nfts":[{"id":"59839","properties":{"name":"Workers","popularity":0}},{"id":"61011","properties":{"name":"Workers","popularity":0}},{"id":"61011","properties":{"name":"Workers","popularity":0}},{"id":"59178","properties":{"name":"Workers","popularity":0}},{"id":"61620","properties":{"name":"Workers","popularity":0}},{"id":"59178","properties":{"name":"Artists","popularity":0,"creativity":"2"}},{"id":"61620","properties":{"name":"Workers","popularity":0}},{"id":"61620","properties":{"name":"Workers","popularity":0}},{"id":"59692","properties":{"name":"Workers","popularity":0}},{"id":"62397","properties":{"name":"Workers","popularity":0}},{"id":"62397","properties":{"name":"Workers","popularity":0}},{"id":"59839","properties":{"name":"Workers","popularity":0}},{"id":"59178","properties":{"name":"Workers","popularity":0}},{"id":"61011","properties":{"name":"Workers","popularity":0}},{"id":"61620","properties":{"name":"Scientists","popularity":0,"education":"2"}},{"id":"59692","properties":{"name":"Workers","popularity":0}},{"id":"54953","properties":{"name":"Workers","popularity":0}},{"id":"62397","properties":{"name":"Workers","popularity":0}},{"id":"59839","properties":{"name":"Workers","popularity":0}},{"id":"59692","properties":{"name":"Workers","popularity":0}},{"id":"59692","properties":{"name":"Workers","popularity":0}},{"id":"59692","properties":{"name":"Workers","popularity":0}},{"id":"61620","properties":{"name":"Workers","popularity":0}},{"id":"54953","properties":{"name":"Workers","popularity":0}},{"id":"71753","properties":{"name":"Workers","popularity":0}},{"id":"368635","properties":{"name":"Scientist","popularity":0,"education":"1"}},{"id":"205550","properties":{"name":"Artist","popularity":0,"creativity":"1"}},{"id":"389718","properties":{"name":"Workers","popularity":0}},{"id":"364651","properties":{"name":"Workers","popularity":0}},{"id":"391112","properties":{"name":"Workers","popularity":0}}],"isSignedWithActiveKey":true}'
+  logs: "{}"
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: 5d15c45b55da13d5c18e9573847a8a2b24fe31b3ff0fef91d1a422b473393349
+  database_hash: fe76c30d7851c9e9fe3d81e42be04a9f473116f6fa3ab2195609a97dc6cf8221
+  timestamp: '2020-09-30 18:06:12'
+  created_at: '2020-09-30 18:06:12'
+  updated_at: '2020-09-30 18:06:12'
+
+nft_set_property_permission:
+  block_num: 233143
+  ref_steem_block_num: 43478788
+  trx_id: a16ce8c87e7b80b5a91736a1af9a7f5e0952f9b5
+  trx_in_block: 0
+  sender: atomcollector
+  contract: nft
+  action: setPropertyPermissions
+  payload: '{"symbol":"STAR","name":"class","accounts":["risingstar2","atomcollector","risingstargame","risingstargame2"],"isSignedWithActiveKey":true}'
+  logs: "{}"
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: d53bf5e9046e3a5ce34d99e3820152a1094fd1a940659aba454cb1cd002af995
+  database_hash: 456484c8c000cb4be20bf33f26fa45e33ac14a58b2a7b8e2949a6e74893fa5e6
+  timestamp: '2020-05-17 11:09:12'
+  created_at: '2020-05-17 11:09:12'
+  updated_at: '2020-05-17 11:09:12'
+
+nft_update_metadata:
+  block_num: 2104426
+  ref_steem_block_num: 47203006
+  trx_id: 063c6de6bb51d5e7102c72d41bd514009823a017
+  trx_in_block: 0
+  sender: etherchest
+  contract: nft
+  action: updateMetadata
+  payload: '{"symbol":"ECGDMND","metadata":{"url":"https://etherchest.com","desc":"1 ETH"},"isSignedWithActiveKey":true}'
+  logs: "{}"
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: a12dacd8a8f0474b032df7479a99819d8f7f696d265d223a0fad472aa56c8687
+  database_hash: 01d53b8d08e438129783934106ae782e35fc6f555d2d54e30786adb77d1a86f1
+  timestamp: '2020-09-24 02:32:48'
+  created_at: '2020-09-24 02:32:48'
+  updated_at: '2020-09-24 02:32:48'
+  
+nft_add_authorized_issuing_accounts:
+  block_num: 232330
+  ref_steem_block_num: 43475666
+  trx_id: 3264b6a55264fc80d6fb021f267751eb612c8a9f
+  trx_in_block: 0
+  sender: atomcollector
+  contract: nft
+  action: addAuthorizedIssuingAccounts
+  payload: '{"symbol":"STAR","accounts":["risingstar2"],"isSignedWithActiveKey":true}'
+  logs: "{}"
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: 727492ec0506093f9dab9ba2c222d117dadd80b8848cdd03baa15a7a7cf9a4bd
+  database_hash: 205d98853af28e0e6e12f6622578f3aacff968bc99c3abe3d09b0ccf69fc5c10
+  timestamp: '2020-05-17 08:32:36'
+  created_at: '2020-05-17 08:32:36'
+  updated_at: '2020-05-17 08:32:36'
+
+nft_add_property_city:
+  block_num: 14250
+  ref_steem_block_num: 42618355
+  trx_id: 662db786c9e544d93513696c0ef11b140805575d
+  trx_in_block: 0
+  sender: gerber
+  contract: nft
+  action: addProperty
+  payload: '{"symbol":"CITY","name":"income","type":"number","authorizedEditingAccounts":["gerber","dcitycards","dcity1"],"isSignedWithActiveKey":true}'
+  logs: "{}"
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: 8567c3f7ed2e1f719906be90aa5c9fe6df1201d0a4988ccccc5f87e63e9c39e4
+  database_hash: a35a9975cb76105f4e56f3415d58188d95831f2825813d75ddd07f61f85855aa
+  timestamp: '2020-04-17 11:36:36'
+  created_at: '2020-04-17 11:36:36'
+  updated_at: '2020-04-17 11:36:36'
+
+nft_set_group_by_city:
+  block_num: 54681
+  ref_steem_block_num: 42818122
+  trx_id: 76e81d9197a84077e1bdf7cee187d101ed27235c
+  trx_in_block: 0
+  sender: gerber
+  contract: nft
+  action: setGroupBy
+  payload: '{"symbol":"CITY","properties":["name","type"],"isSignedWithActiveKey":true}'
+  logs: "{}"
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: f63cf57b7afc456468598dea902ec3054d05fcc8721b1f11713e7a73c109674e
+  database_hash: fc106cf86d27dc9c4b4fbe2fe74a6f8a6a08219c9af489dcf74caee9f8bad377
+  timestamp: '2020-04-24 10:38:09'
+  created_at: '2020-04-24 10:38:09'
+  updated_at: '2020-04-24 10:38:09'
+
+nft_issue_multiple_city:
+  block_num: 2243595
+  ref_steem_block_num: 47426792
+  trx_id: d403625d382fdc1f747b83227eed8f853307c011
+  trx_in_block: 1
+  sender: dcitycards
+  contract: nft
+  action: issueMultiple
+  payload: '{"instances":[{"fromType":"user","symbol":"CITY","to":"alicemudgarden","feeSymbol":"BEE","properties":{"name":"Basic Home","population":4,"income":1,"type":"1st"},"lockTokens":{"SIM":"20"}},{"fromType":"user","symbol":"CITY","to":"alicemudgarden","feeSymbol":"BEE","properties":{"name":"Gym","income":5,"popularity":8,"workers":6,"type":"1st"},"lockTokens":{"SIM":"20"}},{"fromType":"user","symbol":"CITY","to":"alicemudgarden","feeSymbol":"BEE","properties":{"name":"Apartment","population":20,"income":5,"type":"1st"},"lockTokens":{"SIM":"20"}},{"fromType":"user","symbol":"CITY","to":"alicemudgarden","feeSymbol":"BEE","properties":{"name":"Basic Home","population":4,"income":1,"type":"1st"},"lockTokens":{"SIM":"20"}},{"fromType":"user","symbol":"CITY","to":"alicemudgarden","feeSymbol":"BEE","properties":{"name":"Apartment","population":20,"income":5,"type":"1st"},"lockTokens":{"SIM":"20"}}],"isSignedWithActiveKey":true}'
+  logs: '{"events":[{"contract":"tokens","event":"transfer","data":{"from":"dcitycards","to":"null","symbol":"BEE","quantity":"0.00900000"}},{"contract":"tokens","event":"transferToContract","data":{"from":"dcitycards","to":"nft","symbol":"SIM","quantity":"20"}},{"contract":"nft","event":"issue","data":{"from":"dcitycards","fromType":"user","to":"alicemudgarden","toType":"user","symbol":"CITY","lockedTokens":{"SIM":"20"},"lockedNfts":[],"properties":{"name":"Basic Home","population":4,"income":1,"type":"1st"},"id":402338}},{"contract":"tokens","event":"transfer","data":{"from":"dcitycards","to":"null","symbol":"BEE","quantity":"0.00900000"}},{"contract":"tokens","event":"transferToContract","data":{"from":"dcitycards","to":"nft","symbol":"SIM","quantity":"20"}},{"contract":"nft","event":"issue","data":{"from":"dcitycards","fromType":"user","to":"alicemudgarden","toType":"user","symbol":"CITY","lockedTokens":{"SIM":"20"},"lockedNfts":[],"properties":{"name":"Gym","income":5,"popularity":8,"workers":6,"type":"1st"},"id":402339}},{"contract":"tokens","event":"transfer","data":{"from":"dcitycards","to":"null","symbol":"BEE","quantity":"0.00900000"}},{"contract":"tokens","event":"transferToContract","data":{"from":"dcitycards","to":"nft","symbol":"SIM","quantity":"20"}},{"contract":"nft","event":"issue","data":{"from":"dcitycards","fromType":"user","to":"alicemudgarden","toType":"user","symbol":"CITY","lockedTokens":{"SIM":"20"},"lockedNfts":[],"properties":{"name":"Apartment","population":20,"income":5,"type":"1st"},"id":402340}},{"contract":"tokens","event":"transfer","data":{"from":"dcitycards","to":"null","symbol":"BEE","quantity":"0.00900000"}},{"contract":"tokens","event":"transferToContract","data":{"from":"dcitycards","to":"nft","symbol":"SIM","quantity":"20"}},{"contract":"nft","event":"issue","data":{"from":"dcitycards","fromType":"user","to":"alicemudgarden","toType":"user","symbol":"CITY","lockedTokens":{"SIM":"20"},"lockedNfts":[],"properties":{"name":"Basic Home","population":4,"income":1,"type":"1st"},"id":402341}},{"contract":"tokens","event":"transfer","data":{"from":"dcitycards","to":"null","symbol":"BEE","quantity":"0.00900000"}},{"contract":"tokens","event":"transferToContract","data":{"from":"dcitycards","to":"nft","symbol":"SIM","quantity":"20"}},{"contract":"nft","event":"issue","data":{"from":"dcitycards","fromType":"user","to":"alicemudgarden","toType":"user","symbol":"CITY","lockedTokens":{"SIM":"20"},"lockedNfts":[],"properties":{"name":"Apartment","population":20,"income":5,"type":"1st"},"id":402342}}]}'
+  executed_code_hash: a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108bb39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9
+  hash: '00539fd2f56a1a531928f35bc8f3d600e63116cde58201f17484d939b00d9da8'
+  database_hash: 5ac5b2393d5593ff8c5cb2f1aed0f5c55fa8dbcfd7521b31612bdbd5b2aba97d
+  timestamp: '2020-10-01 21:24:24'
+  created_at: '2020-10-01 21:24:24'
+  updated_at: '2020-10-01 21:24:24'
+
+nftmarket_change_price_city:
+  block_num: 2245566
+  ref_steem_block_num: 47429808
+  trx_id: e0c216544e055a342dd93dc2592b78c524c12f0f
+  trx_in_block: 0
+  sender: alicemudgarden
+  contract: nftmarket
+  action: changePrice
+  payload: '{"symbol":"CITY","nfts":["400708","400733","400738","400741","400749","400753","400781"],"price":"5.59","isSignedWithActiveKey":true}'
+  logs: '{"events":[{"contract":"nftmarket","event":"changePrice","data":{"symbol":"CITY","nftId":"400708","oldPrice":"5.73000000","newPrice":"5.59000000","priceSymbol":"SWAP.HIVE","orderId":324525}},{"contract":"nftmarket","event":"changePrice","data":{"symbol":"CITY","nftId":"400733","oldPrice":"5.73000000","newPrice":"5.59000000","priceSymbol":"SWAP.HIVE","orderId":324526}},{"contract":"nftmarket","event":"changePrice","data":{"symbol":"CITY","nftId":"400738","oldPrice":"5.73000000","newPrice":"5.59000000","priceSymbol":"SWAP.HIVE","orderId":324527}},{"contract":"nftmarket","event":"changePrice","data":{"symbol":"CITY","nftId":"400741","oldPrice":"5.73000000","newPrice":"5.59000000","priceSymbol":"SWAP.HIVE","orderId":324528}},{"contract":"nftmarket","event":"changePrice","data":{"symbol":"CITY","nftId":"400749","oldPrice":"5.73000000","newPrice":"5.59000000","priceSymbol":"SWAP.HIVE","orderId":324529}},{"contract":"nftmarket","event":"changePrice","data":{"symbol":"CITY","nftId":"400753","oldPrice":"5.73000000","newPrice":"5.59000000","priceSymbol":"SWAP.HIVE","orderId":324530}},{"contract":"nftmarket","event":"changePrice","data":{"symbol":"CITY","nftId":"400781","oldPrice":"5.73000000","newPrice":"5.59000000","priceSymbol":"SWAP.HIVE","orderId":324531}}]}'
+  executed_code_hash: ab6dbc26ad0b970342cf84f113e4c33c18fad1f9016f97e95e8c93f1ef8a2cde
+  hash: 4ab5d50c25eda189e6461537b6c5bf475058c31deaac9c8dcdc94eb021a07a3d
+  database_hash: 1967ee532d162de96d16b6648625af60eb918456e9c59f1749d2ddfcb71cdbc5
+  timestamp: '2020-10-01 23:55:21'
+  created_at: '2020-10-01 23:55:21'
+  updated_at: '2020-10-01 23:55:21'
+
+nftmarket_cancel_city:
+  block_num: 2245610
+  ref_steem_block_num: 47429871
+  trx_id: efd5d7c7eef6e227f5ab0e4271cd32c573462e61
+  trx_in_block: 0
+  sender: alicemudgarden
+  contract: nftmarket
+  action: cancel
+  payload: '{"symbol":"CITY","nfts":["398237","398241","400762"],"isSignedWithActiveKey":true}'
+  logs: '{"events":[{"contract":"nft","event":"transfer","data":{"from":"nftmarket","fromType":"c","to":"alicemudgarden","toType":"u","symbol":"CITY","id":"398237"}},{"contract":"nft","event":"transfer","data":{"from":"nftmarket","fromType":"c","to":"alicemudgarden","toType":"u","symbol":"CITY","id":"398241"}},{"contract":"nft","event":"transfer","data":{"from":"nftmarket","fromType":"c","to":"alicemudgarden","toType":"u","symbol":"CITY","id":"400762"}},{"contract":"nftmarket","event":"cancelOrder","data":{"account":"alicemudgarden","ownedBy":"u","symbol":"CITY","nftId":"398237","timestamp":1601557452000,"price":"1799.000","priceSymbol":"SIM","fee":500,"orderId":324582}},{"contract":"nftmarket","event":"cancelOrder","data":{"account":"alicemudgarden","ownedBy":"u","symbol":"CITY","nftId":"398241","timestamp":1601557452000,"price":"1799.000","priceSymbol":"SIM","fee":500,"orderId":324583}},{"contract":"nftmarket","event":"cancelOrder","data":{"account":"alicemudgarden","ownedBy":"u","symbol":"CITY","nftId":"400762","timestamp":1601557452000,"price":"1799.000","priceSymbol":"SIM","fee":500,"orderId":324584}}]}'
+  executed_code_hash: ab6dbc26ad0b970342cf84f113e4c33c18fad1f9016f97e95e8c93f1ef8a2cdea9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: c3f46a62c6e14846f95c3d9a33dbe811b3cbec1dc9b0434856264076814a5f4d
+  database_hash: c6e5c123ee6b582c1ae30a5744dac45e620c73eaeab3825aeb0e47920e8da2b3
+  timestamp: '2020-10-01 23:58:30'
+  created_at: '2020-10-01 23:58:30'
+  updated_at: '2020-10-01 23:58:30'
+
+nftmarket_buy_city:
+  block_num: 2245546
+  ref_steem_block_num: 47429765
+  trx_id: c5dd6754f76ea0c5708f19cc4caf779f4e400773
+  trx_in_block: 0
+  sender: daigorokoike
+  contract: nftmarket
+  action: buy
+  payload: '{"symbol":"CITY","nfts":["385068"],"marketAccount":"mysmarket","isSignedWithActiveKey":true}'
+  logs: '{"events":[{"contract":"tokens","event":"transfer","data":{"from":"daigorokoike","to":"mysmarket","symbol":"SWAP.HIVE","quantity":"0.04795000"}},{"contract":"tokens","event":"transfer","data":{"from":"daigorokoike","to":"topdollar001","symbol":"SWAP.HIVE","quantity":"0.91105000"}},{"contract":"nft","event":"transfer","data":{"from":"nftmarket","fromType":"c","to":"daigorokoike","toType":"u","symbol":"CITY","id":"385068"}},{"contract":"nftmarket","event":"hitSellOrder","data":{"symbol":"CITY","priceSymbol":"SWAP.HIVE","account":"daigorokoike","ownedBy":"u","sellers":[{"account":"topdollar001","ownedBy":"u","nftIds":["385068"],"paymentTotal":"0.91105000"}],"paymentTotal":"0.91105000","feeTotal":"0.04795000"}}]}'
+  executed_code_hash: ab6dbc26ad0b970342cf84f113e4c33c18fad1f9016f97e95e8c93f1ef8a2cdeb39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9a9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: '009c43410e819cd0f72df62d65e4922c7e26294ef35a7da3d63e105391a0a830'
+  database_hash: 69a585a05dfdaeeb79d86de4a1086f221ff8c7ef5b90bbfff6da1560f5f40203
+  timestamp: '2020-10-01 23:53:12'
+  created_at: '2020-10-01 23:53:12'
+  updated_at: '2020-10-01 23:53:12'
+
+nftmarket_sell_city:
+  block_num: 2245638
+  ref_steem_block_num: 47429921
+  trx_id: 3d56c521ea559345a98c49546283487fb7e3577a
+  trx_in_block: 0
+  sender: alicemudgarden
+  contract: nftmarket
+  action: sell
+  payload: '{"symbol":"CITY","nfts":["402588"],"price":"5.58","priceSymbol":"SWAP.HIVE","fee":500,"isSignedWithActiveKey":true}'
+  logs: '{"events":[{"contract":"nft","event":"transfer","data":{"from":"alicemudgarden","fromType":"u","to":"nftmarket","toType":"c","symbol":"CITY","id":"402588"}},{"contract":"nftmarket","event":"sellOrder","data":{"account":"alicemudgarden","ownedBy":"u","symbol":"CITY","nftId":"402588","timestamp":1601596860000,"price":"5.58000000","priceSymbol":"SWAP.HIVE","fee":500,"orderId":326573}}]}'
+  executed_code_hash: ab6dbc26ad0b970342cf84f113e4c33c18fad1f9016f97e95e8c93f1ef8a2cdea9fcb0e0d0c8e3f97888f8f95b743deb5f20574152118b23be0a8dea3077108b
+  hash: 2400070fc32dda86c7beb991448c09e0486e1afa57e5e4877f5f0d64ff938035
+  database_hash: 7b38978dac351aad1cf0438e1eba7bdffbb0d470f7502bc97b1db1b4ae680ed7
+  timestamp: '2020-10-02 00:01:00'
+  created_at: '2020-10-02 00:01:00'
+  updated_at: '2020-10-02 00:01:00'
+
+inflation_issue_new_tokens:
+  block_num: 2241716
+  ref_steem_block_num: 47424000
+  trx_id: '47424000'
+  trx_in_block: 4
+  sender: 'null'
+  contract: inflation
+  action: issueNewTokens
+  payload: '{ "isSignedWithActiveKey": true }'
+  logs: '{"events":[{"contract":"tokens","event":"transferFromContract","data":{"from":"tokens","to":"hive-engine","symbol":"BEE","quantity":"11.41552511"}},{"contract":"tokens","event":"transferFromContract","data":{"from":"tokens","to":"hive-miner","symbol":"BEE","quantity":"11.41552511"}}]}'
+  executed_code_hash: d569228ce2477d9d7bdce9bb33012daba5d33288916775e990a8c62b2a92cd61b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9b39ab06d0122894d01c2c6a1b67d85c8c342178177d1e54bda6538b99d49ece9
+  hash: 7d2fc4c7180da85fff3bedb004eea565d8fdd66c565ea7ad0c06364c367b723d
+  database_hash: 8e0d58a0265f6b42f6b2416f483fc35561daee9f4c3bec63a55c99104e78e3ee
+  timestamp: '2020-10-01 19:04:24'
+  created_at: '2020-10-01 19:04:24'
+  updated_at: '2020-10-01 19:04:24'

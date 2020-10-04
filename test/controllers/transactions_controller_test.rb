@@ -50,8 +50,23 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to b_url(0)
   end
   
+  test 'should get index for contract action' do
+    get transactions_url(search: 'nft:create')
+    assert_redirected_to transactions_url(contract: 'nft', contract_action: 'create')
+  end
+  
   test 'should get index for open orders' do
     get transactions_url(open_orders: 'true')
+    assert_response :success
+  end
+  
+  test 'should get index for only errors' do
+    get transactions_url(only_errors: 'true')
+    assert_response :success
+  end
+  
+  test 'should get index for except errors' do
+    get transactions_url(except_errors: 'true')
     assert_response :success
   end
   
@@ -61,7 +76,7 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
   end
   
   # test 'should get index for open orders for multiple accounts' do
-  #   get transactions_url(open_orders: 'true', account: ['alice', 'bob'])
+  #   get transactions_url(open_orders: 'true'), params: {'account[]' => ['alice', 'bob']}
   #   assert_response :success
   # end
   
