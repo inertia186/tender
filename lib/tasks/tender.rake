@@ -221,6 +221,11 @@ namespace :tender do
       
       relation_name = "#{contract_name}_#{action_name.underscore.pluralize}"
       
+      relation_name = case relation_name
+      when 'nft_set_group_bies' then 'nft_set_group_bys'
+      else; relation_name
+      end
+      
       unless trx.respond_to? relation_name
         puts "Unknown action '#{relation_name}' for #{key}"
         
@@ -243,39 +248,109 @@ namespace :tender do
     end
   end
   
+  desc 'Reindex Engine transaction by contract.'
+  task :trx_reindex_contract, [:contract, :turbo] => :environment do |t, args|
+    engine_chain_key_prefix = ENV.fetch('ENGINE_CHAIN_KEY_PREFIX', 'hive_engine')
+    contract_name = args[:contract]
+    turbo = (args[:turbo] || 'false') == 'true'
+    found_transactions = false
+    
+    abort "Contract required." unless !!contract_name
+    
+    transactions = Transaction.where(contract: contract_name)
+    
+    transactions.distinct.pluck(:action).each do |action_name|
+      relation_name = "#{contract_name}_#{action_name.underscore.pluralize}"
+      
+      relation_name = case relation_name
+      when 'nft_set_group_bies' then 'nft_set_group_bys'
+      else; relation_name
+      end
+      
+      begin
+        count = Transaction.with_logs_errors(false).where(contract: contract_name, action: action_name).count
+        class_name = "#{contract_name.upcase_first}#{action_name.upcase_first}"
+        klass = begin
+          Object.const_get(class_name)
+        rescue NameError
+          puts "Unsupported action: #{contract_name}.#{action_name} (no class defined for: #{class_name})"
+          
+          next
+        end
+        existing_count = klass.count
+        
+        puts "Reindexing #{count} #{relation_name} (#{existing_count} exist) ..."
+        
+        Rake::Task['tender:trx_reindex'].invoke(contract_name, action_name, turbo)
+      ensure
+        Rake::Task['tender:trx_reindex'].reenable
+      end
+    end
+  end
+  
   desc 'Reindex Engine transactions by contract and action.'
-  task :trx_reindex, [:contract, :action] => :environment do |t, args|
+  task :trx_reindex, [:contract, :action, :turbo] => :environment do |t, args|
     engine_chain_key_prefix = ENV.fetch('ENGINE_CHAIN_KEY_PREFIX', 'hive_engine')
     contract_name = args[:contract]
     action_name = args[:action]
+    turbo = (args[:turbo] || 'false') == 'true'
     found_transactions = false
     
     abort "Contract and action required." unless !!contract_name && !!action_name
 
     relation_name = "#{contract_name}_#{action_name.underscore.pluralize}"
     
+    relation_name = case relation_name
+    when 'nft_set_group_bies' then 'nft_set_group_bys'
+    else; relation_name
+    end
+
     Transaction.new.send(relation_name) # just testing if the relation exists
+    
+    class_name = "#{contract_name.upcase_first}#{action_name.upcase_first}"
+    klass = begin
+      Object.const_get(class_name)
+    rescue NameError
+      puts "Unsupported action: #{contract_name}.#{action_name} (no class defined for: #{class_name})"
+      
+      next
+    end
     
     transactions = Transaction.where(contract: contract_name, action: action_name)
     
-    transactions.find_each do |trx|
-      begin
-        ActiveRecord::Base.transaction do
-          trx.send(relation_name).destroy_all
-          trx.transaction_accounts.destroy_all
-          trx.transaction_symbols.destroy_all
+    ActiveRecord::Base.transaction do
+      if !!turbo
+        case connection.instance_values["config"][:adapter]
+        when 'sqlite3'
+          puts 'Turbo enabled.'
           
+          connection.execute 'PRAGMA cache_size = 10000'
+          connection.execute 'PRAGMA journal_mode = MEMORY'
+          connection.execute 'PRAGMA temp_store = MEMORY'
+        end
+      end
+      
+      begin
+        klass.destroy_all
+        TransactionAccount.where(trx_id: transactions).destroy_all
+        TransactionSymbol.where(trx_id: transactions).destroy_all
+
+        transactions.where.not(id: TransactionAccount.select(:trx_id)).find_each do |trx|
           action = trx.send(:parse_contract)
           
           if action.kind_of?(ContractAction) && action.persisted?
             found_transactions = true
             
             puts "REINDEXED: #{engine_chain_key_prefix}:#{action.trx.block_num}:#{action.trx.trx_id}:#{action.trx.trx_in_block}:#{action.trx.contract}:#{action.trx.action}"
+          else
+            puts "Skipped #{trx.trx_id} ... (#{trx.errors.messages.inspect})"
           end
         end
       rescue => e
-        puts "Skipped #{trx.trx_id} ... (#{e.inspect})"
+        puts "Skipped #{relation_name} ... (#{e.inspect})"
       end
+      
+      puts 'Committing ...' if found_transactions
     end
     
     abort "Nothing to reindex." unless found_transactions
