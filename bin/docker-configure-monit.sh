@@ -19,7 +19,7 @@ set httpd port 2812 and
     use address localhost  # only accept connection from localhost
     allow localhost        # allow localhost to connect to the server and
     
-check process steem-engine-contracts matching "node /steemsmartcontracts/app.js"
+check process engine-contracts matching "node /steemsmartcontracts/app.js"
   start program = "$APP_ROOT/bin/start-steem-smart-contracts.sh"
     with timeout 90 seconds
   stop program = "$APP_ROOT/bin/stop-steem-smart-contracts.sh"
@@ -34,7 +34,7 @@ check process redis-server matching "/usr/local/bin/redis-server \*:6379"
   group redis-server
   
 check process meeseeker pidfile /meeseeker/meeseeker.pid
-  depends on steem-engine-contracts
+  depends on engine-contracts
   depends on redis-server
   start program = "/bin/bash -c '$APP_ROOT/bin/start-meeseeker.sh'"
     with timeout 90 seconds
@@ -43,7 +43,7 @@ check process meeseeker pidfile /meeseeker/meeseeker.pid
   group meeseeker
   
 check process tender pidfile $APP_ROOT/tender.pid
-  depends on steem-engine-contracts
+  depends on engine-contracts
   depends on redis-server
   depends on meeseeker
   start program = "/bin/bash -c '$APP_ROOT/bin/start-tender.sh'"
