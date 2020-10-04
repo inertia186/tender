@@ -3,4 +3,6 @@ class TokensUpdateParams < ContractAction
   
   validates_presence_of :trx
   validates_presence_of :token_creation_fee
+  validates_presence_of :enable_delegation_fee
+  validates_presence_of :enable_staking_fee
 end

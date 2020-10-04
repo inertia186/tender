@@ -14,26 +14,33 @@ class Transaction < ApplicationRecord
   
   NFT_CONTRACTS = %i(nft nftmarket)
   
+  ENGINE_CHAIN_KEY_PREFIX = ENV.fetch('ENGINE_CHAIN_KEY_PREFIX', 'hive_engine')
+  
   with_options foreign_key: 'trx_id', dependent: :destroy do |trx|
     trx.has_many :contract_deploys
     trx.has_many :contract_updates
+    trx.has_many :inflation_issue_new_tokens, class_name: 'InflationIssueNewTokens'
     trx.has_many :market_buys
     trx.has_many :market_cancels
     trx.has_many :market_sells
+    trx.has_many :market_unlock_tokens, class_name: 'MarketUnlockTokens'
     trx.has_many :sscstore_buys
     trx.has_many :steempegged_buys
     trx.has_many :steempegged_remove_withdrawals
     trx.has_many :steempegged_withdraws
     trx.has_many :tokens_cancel_unstakes
+    trx.has_many :tokens_check_pending_undelegations, class_name: 'TokensCheckPendingUndelegations'
     trx.has_many :tokens_check_pending_unstakes, class_name: 'TokensCheckPendingUnstakes'
     trx.has_many :tokens_creates
     trx.has_many :tokens_delegates
     trx.has_many :tokens_enable_delegations
     trx.has_many :tokens_enable_stakings
     trx.has_many :tokens_issues
+    trx.has_many :tokens_issue_to_contracts
     trx.has_many :tokens_stakes
     trx.has_many :tokens_transfer_ownerships
     trx.has_many :tokens_transfer_to_contracts
+    trx.has_many :tokens_transfer_from_contracts
     trx.has_many :tokens_transfers
     trx.has_many :tokens_undelegates
     trx.has_many :tokens_unstakes
@@ -41,6 +48,11 @@ class Transaction < ApplicationRecord
     trx.has_many :tokens_update_params, class_name: 'TokensUpdateParams'
     trx.has_many :tokens_update_precisions
     trx.has_many :tokens_update_urls
+    trx.has_many :witnesses_approves, class_name: 'WitnessesApprove'
+    trx.has_many :witnesses_disapproves, class_name: 'WitnessesDisapprove'
+    trx.has_many :witnesses_propose_rounds
+    trx.has_many :witnesses_registers
+    trx.has_many :witnesses_schedule_witnesses, class_name: 'WitnessesScheduleWitnesses'
     trx.has_many :nft_add_authorized_issuing_accounts, class_name: 'NftAddAuthorizedIssuingAccounts'
     trx.has_many :nft_add_authorized_issuing_contracts, class_name: 'NftAddAuthorizedIssuingContracts'
     trx.has_many :nft_add_properties
@@ -166,9 +178,9 @@ class Transaction < ApplicationRecord
     end
   }
   
-  def self.meeseeker_ingest(max_transactions = -1, &block)
-    pattern = 'steem_engine:*:*:*:*'
-    ctx = Redis.new(url: ENV.fetch('MEESEEKER_REDIS_URL', 'redis://127.0.0.1:6379/0'))
+  def self.meeseeker_ingest(max_transactions = -1, ctx = nil, &block)
+    pattern = "#{ENGINE_CHAIN_KEY_PREFIX}:*:*:*:*"
+    ctx ||= Redis.new(url: ENV.fetch('MEESEEKER_REDIS_URL', 'redis://127.0.0.1:6379/0'))
     processed = 0
     
     ctx.scan_each(match: pattern) do |key|
@@ -190,7 +202,7 @@ class Transaction < ApplicationRecord
         block_num: b,
         trx_id: trx_id,
         trx_in_block: i,
-        ref_steem_block_num: params['refSteemBlockNumber'],
+        ref_steem_block_num: params['refSteemBlockNumber'] || params['refHiveBlockNumber'],
         sender: params['sender'],
         contract: params['contract'],
         action: params['action'],
@@ -199,7 +211,7 @@ class Transaction < ApplicationRecord
         logs: params['logs'],
         timestamp: Time.parse(params['timestamp'] + 'Z'),
         hash: params['hash'],
-        database_hash: params['databaseHash'],
+        database_hash: params['databaseHash']
       )
       
       if transaction.errors.any?
@@ -286,10 +298,12 @@ private
       params.delete('isSignedWithActiveKey')
       params['action_type'] = params.delete('type') if contract == 'market' && action == 'cancel' && !!params['type']
       params['property_type'] = params.delete('type') if contract == 'nft' && action == 'addProperty' && !!params['type']
+      params['transfer_type'] = params.delete('type') if contract == 'tokens' && action == 'transferFromContract' && !!params['type']
       params['action_id'] = params.delete('id') if !!params['id']
       params['tx_id'] = params.delete('txID') if !!params['txID']
       params['amount_steemsbd'] = params.delete('amountSTEEMSBD') if !!params['amountSTEEMSBD']
       params['memo'] = params['memo'].to_s if params.keys.include? "memo"
+      params['is_read_only'] = false unless params.keys.include? 'is_read_only'
       params['p2p_port'] = params.delete('P2PPort') if !!params['P2PPort']
       params.deep_transform_keys!(&:underscore)
       params.select!{ |k, _v| klass.attribute_names.index(k) }
