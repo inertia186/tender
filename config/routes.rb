@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   
   resources :nfts, only: %i(index show)
   
+  resources :witnesses, only: :index
+  
   resources :blocks, only: %i(show)
   get '/b/:block_num', to: 'blocks#show', as: :b
   

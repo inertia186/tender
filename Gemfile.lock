@@ -182,7 +182,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     nokogiri (1.10.10-x86-mingw32)
       mini_portile2 (~> 2.4.0)
-    pagy (3.8.3)
+    pagy (3.7.5)
     popper_js (1.16.0)
     pry (0.13.1)
       coderay (~> 1.1)
@@ -345,7 +345,7 @@ DEPENDENCIES
   memory_profiler
   mock_redis
   momentjs-rails
-  pagy (~> 3.8)
+  pagy (~> 3.7.2)
   pry (~> 0.12)
   puma (~> 5.0)
   rack-mini-profiler

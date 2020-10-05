@@ -19,6 +19,9 @@ class ContractAction < ApplicationRecord
       end
     end
     
+    # TODO inspect things like nfts field
+    # TODO inspect logs.event fields for "side-effect" actions
+    
     if !!obj.trx.logs
       if !!obj.trx.hydrated_logs['events']
         obj.trx.hydrated_logs['events'].each do |event|

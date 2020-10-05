@@ -22,7 +22,7 @@ module ApplicationHelper
     # and *much* faster.
     trx_symbol = TransactionSymbol.where(symbol: symbol).order(id: :desc).first
     
-    trx = Transaction.find(trx_symbol.trx_id)
+    trx = Transaction.find(trx_symbol.trx_id) rescue nil
     
     trx.created_at if !!trx
   end

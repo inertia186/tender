@@ -43,7 +43,7 @@ gem 'radiator', '~> 0.4.6'
 
 gem 'haml', '~> 5.0'
 gem 'bootstrap', '~> 4.5'
-gem 'pagy', '~> 3.8'
+gem 'pagy', '~> 3.7.2'
 gem 'jquery-rails'
 gem 'json-formatter-rails'
 gem 'momentjs-rails'
