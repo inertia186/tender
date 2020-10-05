@@ -281,7 +281,7 @@ namespace :tender do
         
         puts "Reindexing #{count} #{relation_name} (#{existing_count} exist) ..."
         
-        Rake::Task['tender:trx_reindex'].invoke(contract_name, action_name, turbo)
+        Rake::Task['tender:trx_reindex'].invoke(contract_name, action_name, turbo.to_s)
       ensure
         Rake::Task['tender:trx_reindex'].reenable
       end
@@ -318,18 +318,20 @@ namespace :tender do
     
     transactions = Transaction.where(contract: contract_name, action: action_name)
     
-    ActiveRecord::Base.transaction do
-      if !!turbo
-        case connection.instance_values["config"][:adapter]
-        when 'sqlite3'
-          puts 'Turbo enabled.'
-          
-          connection.execute 'PRAGMA cache_size = 10000'
-          connection.execute 'PRAGMA journal_mode = MEMORY'
-          connection.execute 'PRAGMA temp_store = MEMORY'
-        end
-      end
+    if !!turbo
+      connection = ActiveRecord::Base.connection
       
+      case connection.instance_values["config"][:adapter]
+      when 'sqlite3'
+        puts 'Turbo enabled.'
+        
+        connection.execute 'PRAGMA cache_size = 10000'
+        connection.execute 'PRAGMA journal_mode = MEMORY'
+        connection.execute 'PRAGMA temp_store = MEMORY'
+      end
+    end
+    
+    ActiveRecord::Base.transaction do
       begin
         klass.destroy_all
         TransactionAccount.where(trx_id: transactions).destroy_all
@@ -343,7 +345,7 @@ namespace :tender do
             
             puts "REINDEXED: #{engine_chain_key_prefix}:#{action.trx.block_num}:#{action.trx.trx_id}:#{action.trx.trx_in_block}:#{action.trx.contract}:#{action.trx.action}"
           else
-            puts "Skipped #{trx.trx_id} ... (#{trx.errors.messages.inspect})"
+            puts "Skipped #{trx.trx_id} ... (#{trx.errors.inspect})"
           end
         end
       rescue => e
