@@ -336,8 +336,11 @@ namespace :tender do
         klass.destroy_all
         TransactionAccount.where(trx_id: transactions).destroy_all
         TransactionSymbol.where(trx_id: transactions).destroy_all
-
-        transactions.where.not(id: TransactionAccount.select(:trx_id)).find_each do |trx|
+        
+        transactions = transactions.with_logs_errors(false).
+          where.not(id: TransactionAccount.select(:trx_id))
+        
+        transactions.find_each do |trx|
           action = trx.send(:parse_contract)
           
           if action.kind_of?(ContractAction) && action.persisted?
