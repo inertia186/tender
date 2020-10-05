@@ -8,7 +8,7 @@ gem 'rails', '~> 6.0.0'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 # Use Puma as the app server
-gem 'puma', '~> 4.2'
+gem 'puma', '~> 5.0'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 6.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -42,8 +42,8 @@ gem 'safe_attributes'
 gem 'radiator', '~> 0.4.6'
 
 gem 'haml', '~> 5.0'
-gem 'bootstrap', '~> 4.3.1'
-gem 'pagy', '~> 3.7.2'
+gem 'bootstrap', '~> 4.5'
+gem 'pagy', '~> 3.8'
 gem 'jquery-rails'
 gem 'json-formatter-rails'
 gem 'momentjs-rails'
