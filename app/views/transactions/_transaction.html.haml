@@ -23,7 +23,7 @@
           - when 'issue' then 'issued'
           - else; transaction.action
           &nbsp;
-          %code= number_with_delimiter(payload['quantity']) + ' ' + payload['symbol']
+          %code= number_with_delimiter(payload['quantity']) + ' ' + payload['symbol'] rescue ''
           to
           = link_to payload['to'], account_home_path(payload['to'])
           %code= payload['memo']
@@ -107,7 +107,7 @@
               = surround '(', ')' do
                 = link_to "original transaction #{payload['type']}", tx_path(payload['id'])
             - elsif !!payload['quantity']
-              %code= number_with_delimiter(payload['quantity']) + ' ' + payload['symbol']
+              %code= number_with_delimiter(payload['quantity']) + ' ' + payload['symbol'] rescue ''
               - if !!payload['price']
                 %span.text-muted @
                 %code= number_with_delimiter(payload['price']) + ' ' + core_symbol
