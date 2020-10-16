@@ -65,6 +65,32 @@
           %code= payload['instances'].map{|p| p['symbol']}.uniq.join(', ')
           to
           = payload['instances'].map{|p| link_to p['to'], account_home_path(p['to'])}.uniq.join(', ').html_safe
+          - logs['events'].each do |event|
+            .badge-pill.badge-light.p-1.inset-shadow
+              .bd-highlight.d-flex.align-content-around.flex-wrap
+                - d = event['data']
+                .bd-highlight= "from #{d['fromType'] || 'user'}: #{d['from']}&nbsp;".html_safe
+                \|&nbsp;
+                .bd-highlight= "to #{d['toType'] || 'user'}: #{d['to']}&nbsp;".html_safe
+                \|&nbsp;
+                .bd-highlight= "symbol: #{d['symbol']}&nbsp;".html_safe
+                - if !!d['quantity']
+                  \|&nbsp;
+                  .bd-highlight= "quantity: #{d['quantity']}&nbsp;".html_safe
+                - if !!d['lockedTokens'] && d['lockedTokens'].any?
+                  \|&nbsp;
+                  .bd-highlight= "lockedTokens: #{d['lockedTokens']}&nbsp;".html_safe
+                - if !!d['lockedNfts'] && d['lockedNfts'].any?
+                  \|&nbsp;
+                  .bd-highlight= "lockedNfts: #{d['lockedNfts']}&nbsp;".html_safe
+                - if !!d['properties'] && d['lockedNfts'].any?
+                  \|&nbsp;
+                  .bd-highlight= "properties: #{d['properties']}&nbsp;".html_safe
+                - if !!d['id']
+                  \|&nbsp;
+                  .bd-highlight= "id: #{d['id']}&nbsp;".html_safe
+                -# - d.each do |k, v|
+                -#   .bd-highlight= "#{k}: #{v}&nbsp;".html_safe
         - elsif transaction.contract == 'nft' && transaction.action == 'addProperty'
           added property for
           = link_to payload['symbol'], transactions_path(symbol: payload['symbol'])
