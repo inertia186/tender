@@ -89,8 +89,10 @@
                 - if !!d['id']
                   \|&nbsp;
                   .bd-highlight= "id: #{d['id']}&nbsp;".html_safe
-                -# - d.each do |k, v|
-                -#   .bd-highlight= "#{k}: #{v}&nbsp;".html_safe
+                - if !!d['properties']
+                  - d['properties'].each do |key, value|
+                    \|&nbsp;
+                    .bd-highlight= "#{key}: #{value}&nbsp;".html_safe
         - elsif transaction.contract == 'nft' && transaction.action == 'addProperty'
           added property for
           = link_to payload['symbol'], transactions_path(symbol: payload['symbol'])
