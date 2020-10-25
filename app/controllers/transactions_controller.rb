@@ -29,6 +29,12 @@ class TransactionsController < ApplicationController
       kind = transactions_params[:kind]
       kind = kind.nil? ? nil : kind.to_sym
       @transactions = @transactions.with_symbol(symbol, kind)
+      
+      # Note, although using the consensus_order scope is more accurate here,
+      # during normal operation, when everything is correctly sync'd, :created_at
+      # is approximately correct and *much* faster when searching on a symbol.
+      
+      @transactions = @transactions.except(:order).order(id: :desc)
     end
     
     @token_balance = if !!transactions_params[:account] && !!transactions_params[:symbol]
