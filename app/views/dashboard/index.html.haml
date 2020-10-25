@@ -23,9 +23,10 @@
         .card-body.bg-white
           %h3.card-title.lead Contracts:
           %samp.card-text.float-right= link_to number_with_delimiter(total_contracts_count), contracts_path
-        - cache ['dashboard-most-active', (most_active = TransactionSymbol.most_active).keys] do
+      - cache ['dashboard-most-active', (most_active = TransactionSymbol.most_active).keys] do
+        .card.mb-3.shadow-sm
+          %h3.card-header.bg-light Most Active
           .card-body.bg-white
-            %h3.card-title.lead Most Active:
             %ul.list-group-flush
               - most_active.each do |symbol, count|
                 %li.list-group-item
