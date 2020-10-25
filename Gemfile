@@ -39,7 +39,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 # Deals with schema use of AR keywords in columns like transaction.hash.
 gem 'safe_attributes'
 
-gem 'radiator', '~> 0.4.6'
+gem 'radiator', '~> 0.4.8.pre.1'
 
 gem 'haml', '~> 5.0'
 gem 'bootstrap', '~> 4.5'

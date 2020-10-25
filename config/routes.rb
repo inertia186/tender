@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   get '/open_orders/@:account(/:symbol)', to: 'transactions#open_orders', as: :open_orders, constraints: { account: /([^\/])+/ }
   get '/tx/:trx_id', to: 'transactions#show', as: :tx
   
-  resources :tokens, only: %i(index show) do
+  resources :tokens, only: %i(index show), constraints: {id: /[\w.]+?/, format: /html/} do
     resources :richlist, only: %i(index)
   end
   

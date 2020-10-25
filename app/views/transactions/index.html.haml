@@ -11,7 +11,10 @@
     %span.text-muted>< @
     %span>< #{transactions_params[:account]}
 - elsif !!transactions_params[:symbol]
-  %h1= transactions_params[:symbol]
+  %h1
+    = token_icon(transactions_params[:symbol], img_class: 'float-left')
+    &nbsp;
+    = transactions_params[:symbol]
 
 - cache ['transactions-index', transactions_params, head_block_num] do
   - if @transactions.any?

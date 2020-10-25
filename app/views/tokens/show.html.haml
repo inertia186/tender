@@ -8,20 +8,15 @@
       \-
       = @token.name
       
-      - if !!@metadata
-        - (JSON[@metadata.metadata] rescue {}).each do |k, v|
-          - next unless k == 'icon'
-          - next unless v.present?
-          - icon_url = URI(v) rescue nil
-          - if !!icon_url
-            %span
-              %img.float-right{src: icon_url, width: 48, height: 48}
-
+      = token_icon(@token.symbol, img_class: 'float-right')
+    
     %table.table.table-striped
       %tbody
         %tr
           %th Issuer
-          %td= link_to @token.trx.sender, account_home_path(@token.trx.sender)
+          %td
+            - if !!@token.trx
+              = link_to @token.trx.sender, account_home_path(@token.trx.sender)
         - if !!@metadata
           - (JSON[@metadata.metadata] rescue {}).each do |k, v|
             - next if k == 'icon'
@@ -37,7 +32,9 @@
           %td= number_with_delimiter @token.max_supply
         %tr
           %th Created
-          %td= @token.trx.timestamp
+          %td
+            - if !!@token.trx
+              = @token.trx.timestamp
         %tr
           %th Activity
           %td

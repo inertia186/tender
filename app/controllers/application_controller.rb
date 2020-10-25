@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   include Pagy::Backend
   
+  helper_method :transparent_gif
   helper_method :mainchain, :core_symbol
   helper_method :condenser_api
   helper_method :public_engine_blockchain, :engine_blockchain
@@ -8,10 +9,15 @@ class ApplicationController < ActionController::Base
   helper_method :replaying?
   helper_method :contract_deploy_block_num
   helper_method :total_tokens_count, :total_nfts_count, :total_contracts_count, :active_witnesses_count
+  helper_method :token_metadata, :token_icon
   
   before_action :set_query_only
   after_action :close_agents
 private
+  def transparent_gif
+    'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+  end
+  
   def contract_deploy_block_num(contract_name)
     @@contract_deploy_block_num ||= {}
     
@@ -218,6 +224,55 @@ private
       end
       
       witnesses.size
+    end
+  end
+  
+  def token_metadata(symbol)
+    @token_metadata ||= {}
+    
+    @token_metadata[symbol] ||= TokensUpdateMetadata.where(symbol: symbol).where("metadata LIKE '%\"icon\":%'").last
+    @token_metadata[symbol] ||= NftUpdateMetadata.where(symbol: symbol).where("metadata LIKE '%\"icon\":%'").last
+  end
+  
+  def token_icon(symbol, options = {img_class: '', width: 48, height: 48})
+    Rails.cache.fetch("icon-#{symbol}-#{options.inspect}", expires_in: 10.minutes) do
+      metadata = token_metadata(symbol)
+      img_class = options[:img_class] || ''
+      width = options[:width] || 48
+      height = options[:height] || 48
+      icon_html = "<span><img class=\"#{img_class}\" src=\"#{transparent_gif}\" width=\"#{width}\" height=\"#{height}\" /></span>"
+      
+      if !!metadata
+        (JSON[metadata.metadata] rescue {}).each do |k, v|
+          next unless k == 'icon'
+          next unless v.present?
+          
+          icon_url = v.sub(/^\(/, '')
+          icon_url = URI(icon_url) rescue nil
+          
+          if !!icon_url
+            icon_html = "<span><img class=\"#{img_class}\" src=\"#{icon_url}\" width=\"#{width}\" height=\"#{height}\" /></span>"
+            
+            break
+          end
+        end
+      else
+        if !!(nft_create = NftCreate.where(symbol: symbol).first)
+          icon_url = if !!(nft_update_url = NftUpdateUrl.where(symbol: symbol).last)
+            nft_update_url.url
+          else
+            nft_create.url
+          end
+          
+          icon_url = URI("#{icon_url}/favicon.ico") rescue nil
+          
+          if !!icon_url
+            icon_html = "<span><img class=\"#{img_class}\" src=\"#{icon_url}\" width=\"#{width}\" height=\"#{height}\" /></span>"
+          end
+        end
+      end
+      
+      icon_html.html_safe
     end
   end
 end

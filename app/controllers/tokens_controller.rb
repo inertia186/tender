@@ -40,9 +40,9 @@ class TokensController < ApplicationController
   def show
     @start = Time.now
     @symbol = (tokens_params[:symbol] || tokens_params[:id]).to_s.upcase
-    @token = TokensCreate.find_by!(symbol: @symbol)
+    @token = TokensCreate.find_or_initialize_by(symbol: @symbol)
     @elapsed = Time.now - @start
-    @metadata = TokensUpdateMetadata.where(symbol: @token.symbol).first
+    @metadata = token_metadata(@token.symbol)
   end
 private
   def tokens_params
