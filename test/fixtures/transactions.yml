@@ -58,7 +58,7 @@ genesis_tokens_update_metadata:
   sender: 'null'
   contract: tokens
   action: updateMetadata
-  payload: '{"symbol":"SSC", "metadata": { "url":"https://steem-engine.com", "icon":
+  payload: '{"symbol":"SSC", "metadata": { "url":"https://steem-engine.net", "icon":
     "https://s3.amazonaws.com/steem-engine/images/icon_steem-engine_gradient.svg", "desc":
     "ENG is the native token for the Steem Engine platform" }}'
   executed_code_hash: 4d67e2f2997ecfdabb37295fcafc336f5ca4c3fdec82d718a7b27fb62d8745c9
@@ -537,7 +537,7 @@ tokens_update_url_alice_eng:
   sender: alice
   contract: tokens
   action: updateUrl
-  payload: '{"symbol":"ENG","url":"https://steem-engine.com/","isSignedWithActiveKey":true}'
+  payload: '{"symbol":"ENG","url":"https://steem-engine.net/","isSignedWithActiveKey":true}'
   executed_code_hash: c878ca5ddd0572129dad11bd46dfebed9714eea6b1752c00436932da35120b40
   hash: abdfa0e76f51f9bc3d59274060693a3e12d23b6a7c87e8d8c4697783be063d41
   database_hash: d396324d3f976207b41266a70478923f425d44eac07cbd8780de2abaf90c3a73

@@ -57,7 +57,7 @@ private
   end
   
   def scot_symbols
-    scot_tokens = JSON[open(ENV.fetch('SCOT_API_URL', 'https://scot-api.steem-engine.com') + '/config').read]
+    scot_tokens = JSON[open(ENV.fetch('SCOT_API_URL', 'https://scot-api.steem-engine.net') + '/config').read]
     
     case mainchain.to_sym
     when :steem then scot_tokens.map{|t| t['token'] if !t['hive_engine_enabled']}.compact
